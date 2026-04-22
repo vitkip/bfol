@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ContactController as AdminContact;
 use App\Http\Controllers\Admin\TagController as AdminTag;
 use App\Http\Controllers\Admin\UserController as AdminUser;
 use App\Http\Controllers\Admin\SettingController as AdminSetting;
+use App\Http\Controllers\Admin\NavigationMenuController as AdminNavigation;
 use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\NewsController;
 use App\Http\Controllers\Front\EventController;
@@ -58,6 +59,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('categories',    \App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('users',         AdminUser::class);
     Route::resource('settings',      AdminSetting::class)->only(['index','store']);
+    Route::resource('navigation',    AdminNavigation::class)->except(['show']);
 });
 
 // ─── FRONTEND (locale prefix: lo / en / zh) ───────────────────────────────────

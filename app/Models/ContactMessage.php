@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContactMessage extends Model
 {
-    public $timestamps = false;
+    public $timestamps = true;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'name', 'email', 'phone', 'subject', 'message',

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('event_tags')) {
+            return;
+        }
         Schema::create('event_tags', function (Blueprint $table) {
             $table->id();
             $table->string('name_lo');

@@ -638,6 +638,32 @@ storage/app/public/
 ---
 
 ## ໝາຍເຫດ ການພັດທະນາ
+## ອອກແບບ API
+
+ກຳນົດ endpoint ທີ່ frontend ຈະໃຊ້ (GET/POST/PUT/DELETE)
+ສ້າງ routes/api.php ແລະ controller ສຳລັບ API
+## ຕິດຕັ້ງ Sanctum ແລະຕັ້ງຄ່າ Auth API
+
+ ເພື່ອໃຫ້ React ສາມາດ login/logout ໄດ້ຢ່າງປອດໄພ
+## ສ້າງ React frontend
+
+ເລີ່ມຈາກ create-react-app ຫຼື Vite
+ຕິດຕັ້ງ Tailwind, axios, highcharts
+## ເຊື່ອມຕໍ່ API ຈາກ frontend
+
+ທົດສອບການດຶງຂໍ້ມູນ, ສ້າງ, ແກ້ໄຂ, ລຶບ
+## ເພີ່ມຟີຈເຈີຣ໌ພິເສດ
+
+ສະແດງກາຟ (Highcharts)
+ສົ່ງອອກ PDF (mPDF ທີ່ backend, frontend ດາວໂຫຼດ)
+ທົດສອບ ແລະປັບປຸງ UX/UI
+
+ຄຳແນະນຳ:
+
+ເຮັດ API CRUD ສຳລັບຕາລາງສຳຄັນກ່ອນ (news, users, categories)
+ທົດສອບການ login/logout ຜ່ານ React
+ເຮັດໜ້າ dashboard ສະແດງກາຟຈາກ API
+
 
 - **Multilingual**: ທຸກ model ທີ່ມີ `_lo/_en/_zh` fields ໃຊ້ `HasTranslations` trait
 - **File Upload**: ໃຊ້ `Storage::disk('public')` — ຕ້ອງ run `php artisan storage:link` ກ່ອນ

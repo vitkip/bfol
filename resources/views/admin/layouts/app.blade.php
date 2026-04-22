@@ -141,9 +141,10 @@
 
       <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ໜ້າຫຼັກ</p>
       @foreach([
-          ['admin.slides.*',    route('admin.slides.index'),    'fa-images', 'Slides'],
-          ['admin.banners.*',   route('admin.banners.index'),   'fa-ad',     'Banners'],
-          ['admin.committee.*', route('admin.committee.index'), 'fa-users',  'ຄະນະກໍາມະການ'],
+          ['admin.navigation.*', route('admin.navigation.index'), 'fa-bars',   'ຈັດການເມນູ'],
+          ['admin.slides.*',     route('admin.slides.index'),     'fa-images', 'Slides'],
+          ['admin.banners.*',    route('admin.banners.index'),    'fa-ad',     'Banners'],
+          ['admin.committee.*',  route('admin.committee.index'),  'fa-users',  'ຄະນະກໍາມະການ'],
         ] as [$route, $url, $icon, $label])
         <a href="{{ $url }}"
            class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">

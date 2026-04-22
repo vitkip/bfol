@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, 'Noto Sans Lao', sans-serif;
+  background: #f9fafb;
+  color: #111827;
+}
+
+/* Rich-text content rendered from admin editor */
+.rich-content p          { margin-bottom: 1rem; line-height: 1.8; }
+.rich-content h1,
+.rich-content h2,
+.rich-content h3,
+.rich-content h4         { font-weight: 700; margin: 1.5rem 0 0.75rem; color: #1e3a5f; }
+.rich-content h1         { font-size: 1.5rem; }
+.rich-content h2         { font-size: 1.25rem; }
+.rich-content h3         { font-size: 1.1rem; }
+.rich-content ul,
+.rich-content ol         { padding-left: 1.5rem; margin-bottom: 1rem; }
+.rich-content ul         { list-style: disc; }
+.rich-content ol         { list-style: decimal; }
+.rich-content li         { margin-bottom: 0.4rem; line-height: 1.7; }
+.rich-content strong     { font-weight: 700; }
+.rich-content em         { font-style: italic; }
+.rich-content a          { color: #1d4ed8; text-decoration: underline; }
+.rich-content blockquote { border-left: 4px solid #bfdbfe; padding-left: 1rem; color: #6b7280; font-style: italic; margin: 1.25rem 0; }
+.rich-content img        { max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
+.rich-content table      { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+.rich-content th,
+.rich-content td         { border: 1px solid #e5e7eb; padding: 0.6rem 0.8rem; text-align: left; }
+.rich-content th         { background: #f0f4ff; font-weight: 600; }
