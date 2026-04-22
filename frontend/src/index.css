@@ -1,4 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+
+::selection { background: #F59E0B; color: #1e1b4b; }
+
+img { -webkit-user-drag: none; }
 
 * {
   box-sizing: border-box;
@@ -7,17 +14,89 @@
 }
 
 body {
-  font-family: system-ui, 'Noto Sans Lao', sans-serif;
-  background: #f9fafb;
-  color: #111827;
+  font-family: 'Outfit', 'Phetsarath OT', 'Noto Sans Lao', system-ui, sans-serif;
+  background: #0f0a1e;
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Rich-text content rendered from admin editor */
+/* Lao script needs extra line-height at large sizes for vowel diacritics */
+h1, h2, h3 { line-height: 1.5; }
+
+/* ── Glassmorphism utilities ──────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}
+
+/* ── Aurora background animation ─────────────────────────────────────── */
+@keyframes aurora {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.aurora-bg {
+  background: linear-gradient(-45deg, #0f0a1e, #1e1b4b, #312e81, #1e1b4b, #0f0a1e);
+  background-size: 400% 400%;
+  animation: aurora 20s ease infinite;
+}
+
+/* ── Glow effects ────────────────────────────────────────────────────── */
+.glow-amber {
+  box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.4),
+              0 0 80px -20px rgba(245, 158, 11, 0.2);
+}
+
+.glow-blue {
+  box-shadow: 0 0 40px -10px rgba(37, 99, 235, 0.4),
+              0 0 80px -20px rgba(37, 99, 235, 0.2);
+}
+
+/* ── Floating animation ──────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ── Scroll-triggered fade-in ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Rich-text content rendered from admin editor ────────────────────── */
 .rich-content p          { margin-bottom: 1rem; line-height: 1.8; }
 .rich-content h1,
 .rich-content h2,
 .rich-content h3,
-.rich-content h4         { font-weight: 700; margin: 1.5rem 0 0.75rem; color: #1e3a5f; }
+.rich-content h4         { font-weight: 700; margin: 1.5rem 0 0.75rem; color: #f8fafc; }
 .rich-content h1         { font-size: 1.5rem; }
 .rich-content h2         { font-size: 1.25rem; }
 .rich-content h3         { font-size: 1.1rem; }
@@ -28,10 +107,10 @@ body {
 .rich-content li         { margin-bottom: 0.4rem; line-height: 1.7; }
 .rich-content strong     { font-weight: 700; }
 .rich-content em         { font-style: italic; }
-.rich-content a          { color: #1d4ed8; text-decoration: underline; }
-.rich-content blockquote { border-left: 4px solid #bfdbfe; padding-left: 1rem; color: #6b7280; font-style: italic; margin: 1.25rem 0; }
-.rich-content img        { max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
+.rich-content a          { color: #60a5fa; text-decoration: underline; }
+.rich-content blockquote { border-left: 4px solid #6366f1; padding-left: 1rem; color: #94a3b8; font-style: italic; margin: 1.25rem 0; }
+.rich-content img        { max-width: 100%; border-radius: 0.75rem; margin: 1rem 0; }
 .rich-content table      { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
 .rich-content th,
-.rich-content td         { border: 1px solid #e5e7eb; padding: 0.6rem 0.8rem; text-align: left; }
-.rich-content th         { background: #f0f4ff; font-weight: 600; }
+.rich-content td         { border: 1px solid #334155; padding: 0.6rem 0.8rem; text-align: left; }
+.rich-content th         { background: #1e1b4b; font-weight: 600; }

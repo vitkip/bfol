@@ -10,6 +10,7 @@ import AboutPage       from './pages/public/AboutPage'
 import PlaceholderPage  from './pages/public/PlaceholderPage'
 import CmsPage          from './pages/public/CmsPage'
 import NewsDetailPage   from './pages/public/NewsDetailPage'
+import DocumentsPage    from './pages/public/DocumentsPage'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/about/:sub"   element={<AboutPage />} />
             <Route path="/dhamma/:sub"  element={<PlaceholderPage />} />
             <Route path="/foreign/:sub" element={<PlaceholderPage />} />
+            <Route path="/media/documents" element={<DocumentsPage />} />
             <Route path="/media/:sub"   element={<PlaceholderPage />} />
             <Route path="/lo/page/:slug" element={<CmsPage />} />
             <Route path="*"            element={<Navigate to="/" replace />} />

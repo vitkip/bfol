@@ -29,6 +29,7 @@ Route::prefix('public')->group(function () {
     Route::get('settings',    [PublicController::class, 'settings']);
     Route::get('menu',        [PublicController::class, 'menu']);
     Route::get('pages/{slug}',[PublicController::class, 'page']);
+    Route::get('documents',   [PublicController::class, 'documents']);
     Route::post('contact',    [PublicController::class, 'storeContact']);
 });
 

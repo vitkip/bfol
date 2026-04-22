@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Models\Document;
 use App\Models\Event;
 use App\Models\HeroSlide;
 use App\Models\NavigationMenu;
@@ -263,6 +264,52 @@ class PublicController extends Controller
             'content_en' => $page->content_en,
             'thumbnail'  => $page->thumbnail ? asset('storage/' . $page->thumbnail) : null,
         ]);
+    }
+
+    public function documents(Request $request)
+    {
+        $query = Document::with('category')
+            ->where('is_public', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->latest('published_at');
+
+        if ($request->filled('file_type')) {
+            $query->where('file_type', $request->file_type);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(fn($s) => $s->where('title_lo', 'like', "%{$q}%")
+                                      ->orWhere('title_en', 'like', "%{$q}%")
+                                      ->orWhere('title_zh', 'like', "%{$q}%"));
+        }
+
+        $docs = $query->paginate($request->get('per_page', 15));
+
+        return response()->json($docs->through(fn($d) => [
+            'id'             => $d->id,
+            'title_lo'       => $d->title_lo,
+            'title_en'       => $d->title_en,
+            'title_zh'       => $d->title_zh,
+            'description_lo' => $d->description_lo,
+            'description_en' => $d->description_en,
+            'description_zh' => $d->description_zh,
+            'file_url'       => $d->file_url,
+            'file_type'      => $d->file_type,
+            'file_size_kb'   => $d->file_size_kb,
+            'download_count' => $d->download_count,
+            'category'       => $d->category ? [
+                'id'      => $d->category->id,
+                'name_lo' => $d->category->name_lo,
+                'name_en' => $d->category->name_en,
+            ] : null,
+            'published_at'   => $d->published_at?->format('d/m/Y'),
+        ]));
     }
 
     public function menu()

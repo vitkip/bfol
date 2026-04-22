@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useSiteSettings } from '../../context/SiteSettingsContext'
 import { useLang } from '../../context/LanguageContext'
 import api from '../../api/client'
@@ -43,12 +43,15 @@ export default function Navbar() {
   const [navItems, setNavItems] = useState(FALLBACK)
   const s = useSiteSettings()
   const { pick } = useLang()
+  const location = useLocation()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', onScroll)
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => { setOpen(false) }, [location.pathname])
 
   useEffect(() => {
     api.get('/public/menu')
@@ -61,17 +64,30 @@ export default function Navbar() {
   const renderLink = (item) => {
     if (!item.url) return null
     const isExternal = item.url.startsWith('http')
-    const cls = 'px-3 py-2 text-sm text-gray-700 hover:text-blue-900 font-medium rounded transition-colors'
+    const isActive = location.pathname === item.url
+    const cls = `relative px-3 py-2 text-[13px] font-semibold rounded-xl transition-all duration-300 cursor-pointer group
+      ${isActive ? 'text-amber-400' : 'text-slate-300 hover:text-white'}`
+
+    const content = (
+      <>
+        {label(item)}
+        <span className={`absolute left-1 right-1 bottom-0 h-[2px] bg-amber-400 rounded-full transition-all duration-300
+          ${isActive ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100'}`} />
+      </>
+    )
+
     if (isExternal) {
-      return <a href={item.url} target={item.target || '_blank'} rel="noreferrer" className={cls}>{label(item)}</a>
+      return <a href={item.url} target={item.target || '_blank'} rel="noreferrer" className={cls}>{content}</a>
     }
-    return <Link to={item.url} className={cls}>{label(item)}</Link>
+    return <Link to={item.url} className={cls}>{content}</Link>
   }
 
   const renderMobileLink = (item) => {
     if (!item.url) return null
     const isExternal = item.url.startsWith('http')
-    const cls = 'block px-4 py-3 text-sm font-medium text-gray-700 hover:text-blue-900'
+    const isActive = location.pathname === item.url
+    const cls = `block px-4 py-3 text-sm font-medium rounded-xl transition-all cursor-pointer
+      ${isActive ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`
     if (isExternal) {
       return (
         <a href={item.url} target={item.target || '_blank'} rel="noreferrer"
@@ -84,52 +100,66 @@ export default function Navbar() {
   }
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-white shadow-md' : 'bg-white/95 shadow-sm'
+    <header className={`transition-all duration-500 ease-out rounded-2xl ${
+      scrolled
+        ? 'bg-indigo-950/70 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.3)] border border-white/10'
+        : 'bg-indigo-950/40 backdrop-blur-xl shadow-lg shadow-indigo-950/50 border border-white/5'
     }`}>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <div className="px-4 lg:px-6">
+        <div className="flex items-center justify-between h-14 lg:h-16">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            {s.logo_url ? (
-              <img src={s.logo_url} alt={s.site_name_lo}
-                className="w-10 h-10 rounded-full object-contain bg-white p-0.5 border border-gray-200" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-yellow-400 text-lg">
-                <i className="fas fa-dharmachakra" />
-              </div>
-            )}
-            <div className="leading-tight">
-              <div className="font-bold text-blue-900 text-sm">
+          <Link to="/" className="flex items-center gap-3 min-w-0 group cursor-pointer">
+            <div className="relative">
+              {s.logo_url ? (
+                <img src={s.logo_url} alt={s.site_name_lo}
+                  className="w-10 h-10 rounded-xl object-contain bg-white/10 p-0.5 border border-white/10 shrink-0
+                    group-hover:border-amber-400/30 transition-all" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 flex items-center justify-center text-indigo-950 text-lg shrink-0
+                  shadow-md shadow-amber-500/30 group-hover:shadow-amber-500/50 transition-shadow">
+                  <i className="fas fa-dharmachakra" />
+                </div>
+              )}
+            </div>
+            <div className="leading-tight min-w-0 max-w-[200px] xl:max-w-[280px]">
+              <div className="font-bold text-white text-[14px] truncate tracking-tight group-hover:text-amber-300 transition-colors">
                 {pick(s.site_name_lo, s.site_name_en, s.site_name_zh) || 'ອົງສ · BFOL'}
               </div>
-              <div className="text-xs text-gray-500">{s.site_name_en || 'BFOL'}</div>
+              <div className="text-[11px] font-medium text-slate-400 truncate">{s.site_name_en || 'BFOL'}</div>
             </div>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navItems.map((item) =>
               item.items?.length > 0 ? (
                 <div key={item.id} className="relative group">
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-gray-700 hover:text-blue-900 font-medium rounded transition-colors">
-                    {item.icon && <i className={`${item.icon} text-xs opacity-70 mr-0.5`} />}
+                  <button className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-semibold text-slate-300
+                    hover:text-white rounded-xl transition-all duration-300 cursor-pointer">
+                    {item.icon && <i className={`${item.icon} text-xs opacity-70`} />}
                     {label(item)}
-                    <i className="fas fa-chevron-down text-[10px] opacity-60" />
+                    <i className="fas fa-chevron-down text-[10px] opacity-50 group-hover:-rotate-180 transition-transform duration-300" />
                   </button>
-                  <div className="absolute top-full left-0 min-w-[200px] bg-white shadow-xl rounded-b-xl border-t-2 border-blue-900 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+
+                  {/* Floating Dropdown — Glassmorphism */}
+                  <div className="absolute top-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2 min-w-[230px]
+                    glass rounded-2xl p-2
+                    opacity-0 invisible scale-95 origin-top
+                    group-hover:opacity-100 group-hover:visible group-hover:scale-100
+                    transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-50">
                     {item.items.map((sub) => {
                       const isExt = sub.url?.startsWith('http')
-                      const subCls = 'block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-900 first:rounded-none last:rounded-b-xl transition-colors'
+                      const subCls = `flex items-center px-4 py-2.5 text-[13px] font-medium text-slate-300
+                        hover:text-amber-400 hover:bg-white/5 rounded-xl transition-all duration-200 cursor-pointer`
                       return isExt ? (
                         <a key={sub.id} href={sub.url} target={sub.target || '_blank'} rel="noreferrer" className={subCls}>
-                          {sub.icon && <i className={`${sub.icon} text-xs mr-1.5 opacity-60`} />}
+                          {sub.icon && <i className={`${sub.icon} text-[11px] mr-2 text-slate-500`} />}
                           {label(sub)}
                         </a>
                       ) : (
                         <Link key={sub.id} to={sub.url || '#'} className={subCls}>
-                          {sub.icon && <i className={`${sub.icon} text-xs mr-1.5 opacity-60`} />}
+                          {sub.icon && <i className={`${sub.icon} text-[11px] mr-2 text-slate-500`} />}
                           {label(sub)}
                         </Link>
                       )
@@ -141,58 +171,66 @@ export default function Navbar() {
 
             {s.site_facebook && (
               <a href={s.site_facebook} target="_blank" rel="noreferrer"
-                className="ml-2 flex items-center gap-1.5 px-3 py-2 bg-blue-800 text-white text-sm rounded-lg hover:bg-blue-900 transition-colors">
-                <i className="fab fa-facebook-f text-xs" /> DhammaOnLen
+                className="ml-4 flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-400
+                  text-indigo-950 text-[13px] font-bold rounded-xl cursor-pointer
+                  shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/40
+                  hover:-translate-y-0.5 transition-all duration-300">
+                <i className="fab fa-facebook-f text-[11px]" /> DhammaOnLen
               </a>
             )}
           </nav>
 
           {/* Mobile hamburger */}
-          <button onClick={() => setOpen(!open)} className="lg:hidden flex flex-col gap-1.5 p-2">
-            <span className={`block h-0.5 w-6 bg-gray-700 transition-all ${open ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block h-0.5 w-6 bg-gray-700 transition-all ${open ? 'opacity-0' : ''}`} />
-            <span className={`block h-0.5 w-6 bg-gray-700 transition-all ${open ? '-rotate-45 -translate-y-2' : ''}`} />
+          <button onClick={() => setOpen(!open)}
+            className="lg:hidden flex flex-col gap-[5px] p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer">
+            <span className={`block h-[2px] w-5 bg-slate-300 rounded-full transition-all duration-300 ${open ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block h-[2px] w-5 bg-slate-300 rounded-full transition-all duration-300 ${open ? 'opacity-0' : ''}`} />
+            <span className={`block h-[2px] w-5 bg-slate-300 rounded-full transition-all duration-300 ${open ? '-rotate-45 -translate-y-[7px]' : ''}`} />
           </button>
         </div>
 
-        {/* Mobile menu */}
-        {open && (
-          <div className="lg:hidden border-t pb-4">
+        {/* Mobile menu dropdown */}
+        <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-out
+          ${open ? 'max-h-[80vh] opacity-100 mt-2 pb-4' : 'max-h-0 opacity-0 mt-0'}`}>
+          <div className="glass rounded-2xl p-2 flex flex-col gap-1 max-h-[75vh] overflow-y-auto">
             {navItems.map((item) =>
               item.items?.length > 0 ? (
-                <div key={item.id}>
+                <div key={item.id} className="bg-white/3 rounded-xl overflow-hidden">
                   <button onClick={() => setOpenDrop(openDrop === item.id ? null : item.id)}
-                    className="w-full flex justify-between items-center px-4 py-3 text-sm font-medium text-gray-700">
+                    className="w-full flex justify-between items-center px-4 py-3 text-sm font-semibold
+                      text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
                     <span className="flex items-center gap-2">
-                      {item.icon && <i className={`${item.icon} text-xs text-blue-600`} />}
+                      {item.icon && <i className={`${item.icon} text-xs text-amber-500`} />}
                       {label(item)}
                     </span>
-                    <i className={`fas fa-chevron-${openDrop === item.id ? 'up' : 'down'} text-xs`} />
+                    <i className={`fas fa-chevron-down text-[10px] transition-transform duration-300
+                      ${openDrop === item.id ? 'rotate-180 text-amber-400' : 'text-slate-500'}`} />
                   </button>
-                  {openDrop === item.id && (
-                    <div className="bg-gray-50 pl-4">
+                  <div className={`transition-all duration-300 overflow-hidden
+                    ${openDrop === item.id ? 'max-h-[500px] opacity-100 pb-2' : 'max-h-0 opacity-0'}`}>
+                    <div className="px-2 flex flex-col gap-1">
                       {item.items.map((sub) => {
                         const isExt = sub.url?.startsWith('http')
+                        const subCls = "block px-4 py-2.5 text-[13px] font-medium text-slate-400 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
                         return isExt ? (
                           <a key={sub.id} href={sub.url} target={sub.target || '_blank'} rel="noreferrer"
-                            onClick={() => setOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-900">
+                            onClick={() => setOpen(false)} className={subCls}>
                             {label(sub)}
                           </a>
                         ) : (
                           <Link key={sub.id} to={sub.url || '#'} onClick={() => setOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-900">
+                            className={subCls}>
                             {label(sub)}
                           </Link>
                         )
                       })}
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : item.url ? renderMobileLink(item) : null
             )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   )
