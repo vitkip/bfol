@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\MouController as AdminMou;
 use App\Http\Controllers\Admin\MonkProgramController as AdminMonkProgram;
 use App\Http\Controllers\Admin\AidProjectController as AdminAidProject;
 use App\Http\Controllers\Admin\CommitteeController as AdminCommittee;
+use App\Http\Controllers\Admin\DepartmentController as AdminDepartment;
 use App\Http\Controllers\Admin\SlideController as AdminSlide;
 use App\Http\Controllers\Admin\BannerController as AdminBanner;
 use App\Http\Controllers\Admin\ContactController as AdminContact;
@@ -51,6 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('monk-programs', AdminMonkProgram::class);
     Route::resource('aid-projects',  AdminAidProject::class);
     Route::resource('committee',     AdminCommittee::class);
+    Route::resource('departments',   AdminDepartment::class);
     Route::resource('slides',        AdminSlide::class);
     Route::resource('banners',       AdminBanner::class);
     Route::resource('contacts',      AdminContact::class)->only(['index','show','destroy']);
@@ -62,26 +64,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('navigation',    AdminNavigation::class)->except(['show']);
 });
 
-// ─── FRONTEND (locale prefix: lo / en / zh) ───────────────────────────────────
-foreach (['lo', 'en', 'zh'] as $locale) {
-    Route::prefix($locale)->name("{$locale}.")->group(function () use ($locale) {
-        Route::get('/',         [HomeController::class,    'index'])->name('home');
-        Route::get('news',      [NewsController::class,    'index'])->name('news.index');
-        Route::get('news/{slug}',[NewsController::class,   'show'])->name('news.show');
-        Route::get('events',    [EventController::class,   'index'])->name('events.index');
-        Route::get('events/{slug}',[EventController::class,'show'])->name('events.show');
-        Route::get('media',     [MediaController::class,   'index'])->name('media.index');
-        Route::get('page/{slug}',[PageController::class,   'show'])->name('page.show');
-        Route::get('contact',   [ContactController::class, 'show'])->name('contact');
-        Route::post('contact',  [ContactController::class, 'submit'])->name('contact.submit');
-        Route::get('search',    [SearchController::class,  'index'])->name('search');
-    });
-}
+// ─── LANGUAGE SWITCHER ────────────────────────────────────────────────────────
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['lo', 'en', 'zh'])) {
+        session(['locale' => $locale]);
+    }
+    return back();
+})->name('lang.switch');
 
-// ─── ROOT REDIRECT → default locale ──────────────────────────────────────────
-Route::get('/', fn() => redirect('/' . config('app.locale', 'lo')))->name('home');
-Route::get('/news/{slug}',    fn($slug) => redirect('/' . config('app.locale', 'lo') . '/news/' . $slug));
-Route::get('/events/{slug}',  fn($slug) => redirect('/' . config('app.locale', 'lo') . '/events/' . $slug));
-Route::get('/media',          fn() => redirect('/' . config('app.locale', 'lo') . '/media'));
-Route::get('/contact',        fn() => redirect('/' . config('app.locale', 'lo') . '/contact'));
-Route::get('/search',         fn() => redirect('/' . config('app.locale', 'lo') . '/search'));
+// ─── FRONTEND (Session Based Locale) ──────────────────────────────────────────
+Route::name('front.')->group(function () {
+    Route::get('/',         [HomeController::class,    'index'])->name('home');
+    Route::get('news',      [NewsController::class,    'index'])->name('news.index');
+    Route::get('news/{slug}',[NewsController::class,   'show'])->name('news.show');
+    Route::get('events',    [EventController::class,   'index'])->name('events.index');
+    Route::get('events/{slug}',[EventController::class,'show'])->name('events.show');
+    Route::get('media',     [MediaController::class,   'index'])->name('media.index');
+    Route::get('page/{slug}',[PageController::class,   'show'])->name('page.show');
+    Route::get('contact',   [ContactController::class, 'show'])->name('contact');
+    Route::post('contact',  [ContactController::class, 'submit'])->name('contact.submit');
+    Route::get('search',    [SearchController::class,  'index'])->name('search');
+});

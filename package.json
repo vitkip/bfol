@@ -8,11 +8,17 @@
     },
     "devDependencies": {
         "@alpinejs/mask": "^3.15.11",
+        "@fontsource/inter": "^5.2.8",
+        "@fontsource/noto-sans-lao": "^5.2.8",
+        "@fontsource/noto-serif-lao": "^5.2.7",
         "@tailwindcss/vite": "^4.2.2",
         "alpinejs": "^3.15.11",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^3.0.0",
         "tailwindcss": "^4.2.2",
         "vite": "^8.0.0"
+    },
+    "dependencies": {
+        "lucide-react": "^1.8.0"
     }
 }

@@ -1,4 +1,13 @@
 @import 'tailwindcss';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/noto-sans-lao/400.css';
+@import '@fontsource/noto-sans-lao/600.css';
+@import '@fontsource/noto-sans-lao/700.css';
+@import '@fontsource/noto-serif-lao/400.css';
+@import '@fontsource/noto-serif-lao/600.css';
+@import '@fontsource/noto-serif-lao/700.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,6 +15,53 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', 'Noto Sans Lao', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Noto Serif Lao', ui-serif, Georgia, serif;
+
+    /* BFOL Colors */
+    --color-midnight-50: #eff6ff;
+    --color-midnight-100: #dbeafe;
+    --color-midnight-500: #3b82f6;
+    --color-midnight-600: #2563eb;
+    --color-midnight-800: #1e40af;
+    --color-midnight-900: #0a1930;
+    --color-midnight-950: #040d1f;
+
+    --color-gold-400: #facc15;
+    --color-gold-500: #eab308;
+    --color-gold-600: #ca8a04;
+}
+
+@layer base {
+    body {
+        @apply font-sans bg-slate-50 text-slate-900 antialiased selection:bg-gold-500/30 selection:text-midnight-900;
+        line-height: 1.6;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-serif tracking-tight text-midnight-950;
+    }
+}
+
+@layer components {
+    .container {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+    
+    .btn {
+        @apply inline-flex items-center justify-center px-6 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    }
+    .btn-primary {
+        @apply bg-midnight-900 text-white hover:bg-midnight-800 focus:ring-midnight-900 shadow-md shadow-midnight-900/20;
+    }
+    .btn-gold {
+        @apply bg-gold-500 text-midnight-950 hover:bg-gold-400 focus:ring-gold-500 shadow-md shadow-gold-500/20;
+    }
+    .btn-outline {
+        @apply border border-slate-200 bg-white text-slate-700 hover:border-midnight-900 hover:text-midnight-900 focus:ring-slate-200;
+    }
+    
+    .card {
+        @apply bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300 hover:shadow-md;
+    }
 }

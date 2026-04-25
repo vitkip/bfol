@@ -163,10 +163,13 @@
                       {{-- Default: text input --}}
                       @php
                         $inputType = match(true) {
-                          str_contains($setting->key, 'email')    => 'email',
-                          str_contains($setting->key, 'phone')    => 'tel',
-                          str_contains($setting->key, 'facebook') => 'url',
-                          str_contains($setting->key, 'youtube')  => 'url',
+                          str_contains($setting->key, 'email')     => 'email',
+                          str_contains($setting->key, 'phone')     => 'tel',
+                          str_contains($setting->key, 'whatsapp')  => 'tel',
+                          str_contains($setting->key, 'facebook')  => 'url',
+                          str_contains($setting->key, 'youtube')   => 'url',
+                          str_contains($setting->key, 'line')      => 'url',
+                          str_contains($setting->key, 'wechat')    => 'url',
                           default => 'text',
                         };
                       @endphp

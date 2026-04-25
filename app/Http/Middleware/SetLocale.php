@@ -12,13 +12,11 @@ class SetLocale
 
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->segment(1);
-
+        $locale = session('locale', config('app.locale', 'lo'));
         if (in_array($locale, self::SUPPORTED)) {
             app()->setLocale($locale);
-            session(['locale' => $locale]);
         } else {
-            app()->setLocale(session('locale', config('app.locale')));
+            app()->setLocale(config('app.locale', 'lo'));
         }
 
         return $next($request);
