@@ -210,7 +210,7 @@
 
       <h1 class="flex-1 text-base sm:text-lg font-bold tracking-tight truncate">@yield('page_title', 'Dashboard')</h1>
 
-      <a href="{{ url('/lo') }}" target="_blank"
+      <a href="{{ url('/') }}" target="_blank"
          class="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary transition-colors px-3 py-1.5 rounded-full bg-surface-container-low ghost-border whitespace-nowrap flex-shrink-0">
         <i class="fas fa-globe text-xs"></i>
         <span class="hidden sm:inline">ເວັບໄຊ</span>

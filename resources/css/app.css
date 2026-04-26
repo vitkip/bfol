@@ -18,19 +18,67 @@
     --font-sans: 'Inter', 'Noto Sans Lao', ui-sans-serif, system-ui, sans-serif;
     --font-serif: 'Noto Serif Lao', ui-serif, Georgia, serif;
 
-    /* BFOL Colors */
-    --color-midnight-50: #eff6ff;
+    /* ── Admin palette ─────────────────────────────────── */
+    --color-midnight-50:  #eff6ff;
     --color-midnight-100: #dbeafe;
     --color-midnight-500: #3b82f6;
     --color-midnight-600: #2563eb;
     --color-midnight-800: #1e40af;
     --color-midnight-900: #0a1930;
     --color-midnight-950: #040d1f;
-
     --color-gold-400: #facc15;
     --color-gold-500: #eab308;
     --color-gold-600: #ca8a04;
+
+    /* ── Front-end BFOL brand tokens ───────────────────── */
+    --color-primary:                  #031632;
+    --color-on-primary:               #ffffff;
+    --color-primary-container:        #1a2b48;
+    --color-on-primary-container:     #8293b5;
+    --color-inverse-primary:          #b6c7eb;
+
+    --color-secondary:                #c5a021;
+    --color-on-secondary:             #ffffff;
+    --color-secondary-container:      #fcd353;
+    --color-on-secondary-container:   #725a00;
+
+    --color-background:               #f9f9f9;
+    --color-on-background:            #1a1c1c;
+
+    --color-surface:                  #f9f9f9;
+    --color-surface-dim:              #dadada;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low:    #f3f3f4;
+    --color-surface-container:        #eeeeee;
+    --color-surface-container-high:   #e8e8e8;
+    --color-surface-container-highest:#e2e2e2;
+    --color-on-surface:               #1a1c1c;
+    --color-on-surface-variant:       #44474d;
+
+    --color-outline:                  #75777e;
+    --color-outline-variant:          #c5c6ce;
 }
+
+/* ── Front-end keyframes ───────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes scroll-x {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scroll-x-reverse {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+@keyframes progress-bar {
+  from { width: 0% }
+  to   { width: 100% }
+}
+
+.animate-float     { animation: float 6s ease-in-out infinite; }
+.progress-running  { animation: progress-bar 6s linear forwards; }
 
 @layer base {
     body {
@@ -64,4 +112,18 @@
     .card {
         @apply bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300 hover:shadow-md;
     }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-slate-200 rounded-full;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-slate-300;
+    }
 }
+

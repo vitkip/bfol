@@ -26,6 +26,7 @@ use App\Http\Controllers\Front\EventController;
 use App\Http\Controllers\Front\MediaController;
 use App\Http\Controllers\Front\PageController;
 use App\Http\Controllers\Front\ContactController;
+use App\Http\Controllers\Front\CommitteeController;
 use App\Http\Controllers\Front\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,5 +84,6 @@ Route::name('front.')->group(function () {
     Route::get('page/{slug}',[PageController::class,   'show'])->name('page.show');
     Route::get('contact',   [ContactController::class, 'show'])->name('contact');
     Route::post('contact',  [ContactController::class, 'submit'])->name('contact.submit');
+    Route::get('committee', [CommitteeController::class,'index'])->name('committee');
     Route::get('search',    [SearchController::class,  'index'])->name('search');
 });

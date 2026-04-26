@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('front.home', [
+        return view('front.home.index', [
             'slides'      => HeroSlide::active()->get(),
             'statistics'  => SiteStatistic::active()->get(),
             'latest_news' => News::published()->with('category')->latest('published_at')->limit(6)->get(),

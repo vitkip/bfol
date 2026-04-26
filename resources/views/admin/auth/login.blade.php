@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ເຂົ້າສູ່ລະບົບ — BFOL Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Phetsarath+OT&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Phetsarath:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
@@ -34,16 +34,16 @@
             full:    "9999px",
           },
           fontFamily: {
-            headline: ["Phetsarath OT", "Manrope", "sans-serif"],
-            body:     ["Phetsarath OT", "Inter", "sans-serif"],
+            headline: ["Phetsarath", "Manrope", "sans-serif"],
+            body:     ["Phetsarath", "Inter", "sans-serif"],
           }
         }
       }
     }
   </script>
   <style>
-    body { font-family: 'Phetsarath OT', sans-serif; }
-    h1, h2, h3 { font-family: 'Phetsarath OT', 'Manrope', sans-serif; }
+    body { font-family: 'Phetsarath', sans-serif; }
+    h1, h2, h3 { font-family: 'Phetsarath', 'Manrope', sans-serif; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
     .ghost-border  { border: 1px solid rgba(194,198,212,0.30); }
     .primary-gradient { background: linear-gradient(135deg, #00488d 0%, #005fb8 100%); }
@@ -69,19 +69,22 @@
 
       {{-- Left: Image Panel --}}
       <div class="hidden md:block relative overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-          alt="ວັດລາວ"
-          class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.style.background='linear-gradient(135deg,#00488d,#005fb8)';this.removeAttribute('src')"
-        />
-        <div class="absolute inset-0 bg-primary/30 flex flex-col justify-end p-12">
-          <div class="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/10">
-            <h2 class="text-3xl font-bold text-white mb-2 leading-tight">
-              ດິຈິຕອນສາສະໜາ
+        
+        <div class="absolute inset-0 bg-primary/30 flex flex-col items-start p-12">
+          
+        <div class="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/10 flex flex-col items-center">
+            <img
+              src="/storage/logo.png"
+              alt="BFOL Logo"
+              class="w-32 h-32 object-contain bg-white rounded-full mb-6 mt-2 shadow-lg"
+              style="position:static"
+              onerror="this.style.background='linear-gradient(135deg,#00488d,#005fb8)';this.removeAttribute('src')"
+            />
+            <h2 class="text-3xl font-bold text-white mb-2 leading-tight text-center">
+              ສູນກາງອົງການພຸດທະສາສະນາສັມພັນແຫ່ງ ສປປ ລາວ
             </h2>
-            <p class="text-white/80 text-base font-light leading-relaxed">
-              ຈັດການຂ່າວສານ, ກິດຈະກໍາແລະຄວາມສໍາພັນສາກົນຂອງກໍມາທິການການຕ່າງປະເທດອພສຜ່ານລະບົບ CMS ທີ່ທັນສະໄໝ.
+            <p class="text-white/80 text-base font-light leading-relaxed text-center">
+              Central Buddhist Fellowship Organization of Lao PDR
             </p>
           </div>
         </div>
@@ -96,7 +99,7 @@
             ຍິນດີຕ້ອນຮັບເຂົ້າສູ່ລະບົບ
           </h1>
           <p class="text-on-surface-variant text-sm leading-relaxed">
-            ກະລຸນາປ້ອນຂໍ້ມູນຂອງທ່ານເພື່ອເຂົ້າໃຊ້ງານ Sanctuary CMS
+            ລະບົບບໍລິຫານຈັດການຂໍມູນຂ່າວສານ ຂອງກັມມາທິການ ການຕ່າງປະເທດ
           </p>
         </div>
 
