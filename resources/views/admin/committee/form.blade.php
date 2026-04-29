@@ -392,9 +392,10 @@
                   class="w-full px-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option value="">— ບໍ່ມີພະແນກ —</option>
             @foreach($departments as $dept)
-              <option value="{{ $dept->id }}" @selected(old('department_id', $member->department_id) == $dept->id)>
-                {{ $dept->name_lo }}
-                @if($dept->name_en) · {{ $dept->name_en }}@endif
+              <option value="{{ $dept['id'] }}"
+                      @selected(old('department_id', $member->department_id) == $dept['id'])
+                      style="{{ $dept['depth'] > 0 ? 'padding-left:1.25rem;color:#64748b;' : 'font-weight:600;' }}">
+                {{ $dept['depth'] > 0 ? '↳ ' : '' }}{{ $dept['label'] }}
               </option>
             @endforeach
           </select>

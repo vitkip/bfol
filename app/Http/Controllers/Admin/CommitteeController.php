@@ -34,7 +34,7 @@ class CommitteeController extends Controller
         }
 
         $members     = $query->paginate(20)->withQueryString();
-        $departments = Department::active()->get();
+        $departments = $this->deptOptions();
         $counts      = [
             'all'      => CommitteeMember::count(),
             'active'   => CommitteeMember::where('is_active', true)->count(),
@@ -47,7 +47,7 @@ class CommitteeController extends Controller
     public function create()
     {
         $member      = new CommitteeMember();
-        $departments = Department::active()->get();
+        $departments = $this->deptOptions();
         return view('admin.committee.form', compact('member', 'departments'));
     }
 
@@ -72,7 +72,7 @@ class CommitteeController extends Controller
 
     public function edit(CommitteeMember $committee)
     {
-        $departments = Department::active()->get();
+        $departments = $this->deptOptions();
         return view('admin.committee.form', ['member' => $committee, 'departments' => $departments]);
     }
 
@@ -102,6 +102,18 @@ class CommitteeController extends Controller
 
         return redirect()->route('admin.committee.index')
                          ->with('success', 'ລົບສະມາຊິກສຳເລັດ');
+    }
+
+    private function deptOptions(): \Illuminate\Support\Collection
+    {
+        return Department::with('parent')
+            ->active()
+            ->get()
+            ->map(fn($d) => [
+                'id'    => $d->id,
+                'label' => $d->breadcrumbName(),
+                'depth' => $d->parent_id ? 1 : 0,
+            ]);
     }
 
     private function validated(Request $request): array

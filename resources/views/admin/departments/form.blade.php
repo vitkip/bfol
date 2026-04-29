@@ -6,7 +6,7 @@
 
 <form method="POST"
       action="{{ $department->exists ? route('admin.departments.update', $department) : route('admin.departments.store') }}"
-      x-data="{ tab: 'lo' }">
+      x-data="{ tab: 'lo', confirmParent: false }">
   @csrf
   @if($department->exists) @method('PUT') @endif
 
@@ -177,6 +177,33 @@
               <p class="text-[11px] text-outline">ສະແດງໃນ dropdown ສະມາຊິກ</p>
             </div>
           </label>
+
+          {{-- Parent department --}}
+          <div>
+            <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">
+              ໜ່ວຍງານຫຼັກ (Parent)
+              @if($department->exists && $department->children()->exists())
+                <span class="ml-1 text-amber-600 text-[10px]">⚠ ມີ sub-ພະແນກ</span>
+              @endif
+            </label>
+            <select name="parent_id"
+                    class="w-full px-3 py-2 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                           focus:outline-none focus:ring-2 focus:ring-primary/30
+                           @error('parent_id') border-red-300 @enderror">
+              <option value="">— ບໍ່ມີ (ໜ່ວຍງານຫຼັກ) —</option>
+              @foreach($parents as $p)
+                <option value="{{ $p['id'] }}"
+                        {{ old('parent_id', $department->parent_id) == $p['id'] ? 'selected' : '' }}
+                        style="{{ $p['depth'] > 0 ? 'padding-left:1.5rem;color:#64748b;' : 'font-weight:600;' }}">
+                  {{ $p['depth'] > 0 ? '↳ ' : '' }}{{ $p['label'] }}
+                </option>
+              @endforeach
+            </select>
+            @error('parent_id')
+              <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-[10px] text-outline">ເລືອກເພື່ອເຮັດໃຫ້ເປັນ sub-ພະແນກ ພາຍໃຕ້ໜ່ວຍງານຫຼັກ</p>
+          </div>
 
           <div>
             <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">ລຳດັບ (Sort order)</label>

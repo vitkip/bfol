@@ -1,117 +1,199 @@
 @extends('front.layouts.app')
 
-@section('title', $item->trans('title') . ' - ' . __('app.nav.news'))
+@php
+  $L = app()->getLocale();
+  $t = fn($lo,$en,$zh) => match($L){'zh'=>$zh,'en'=>$en,default=>$lo};
+
+  $thumb = $item->thumbnail;
+  if ($thumb && !\Str::startsWith($thumb, ['http','https','/storage'])) {
+      $thumb = \Illuminate\Support\Facades\Storage::url($thumb);
+  }
+  $title   = $item->trans('title');
+  $excerpt = $item->trans('excerpt');
+  $content = $item->trans('content');
+  $catName = $item->category?->trans('name');
+@endphp
+
+@section('title', $title.' - '.($settings->site_name_lo ?: 'BFOL'))
+@section('meta_description', $excerpt ?: $title)
+
+@push('styles')
+<style>
+  .prose-bfol { font-size:.9375rem; line-height:1.8; color:#1e293b; }
+  .prose-bfol h2,.prose-bfol h3,.prose-bfol h4 { font-family:inherit; font-weight:700; color:#0f172a; margin:1.5em 0 .6em; }
+  .prose-bfol h2 { font-size:1.35rem; }
+  .prose-bfol h3 { font-size:1.1rem; }
+  .prose-bfol p { margin:.9em 0; }
+  .prose-bfol ul,.prose-bfol ol { margin:.8em 0 .8em 1.5rem; }
+  .prose-bfol li { margin:.3em 0; }
+  .prose-bfol a { color:var(--color-primary); text-decoration:underline; }
+  .prose-bfol img { border-radius:.75rem; max-width:100%; height:auto; margin:1.5em 0; }
+  .prose-bfol blockquote { border-left:4px solid var(--color-secondary); padding:.6em 1em; background:#fefce8; border-radius:0 .5rem .5rem 0; font-style:italic; margin:1.2em 0; }
+  .dot-pattern { background-image:radial-gradient(circle,rgba(255,255,255,.12) 1px,transparent 1px); background-size:28px 28px; }
+</style>
+@endpush
 
 @section('content')
 
-@php
-    $thumbUrl = $item->thumbnail;
-    if ($thumbUrl && !\Illuminate\Support\Str::startsWith($thumbUrl, ['http://', 'https://'])) {
-        $thumbUrl = \Illuminate\Support\Str::startsWith($thumbUrl, '/storage/') 
-            ? $thumbUrl 
-            : Storage::url($thumbUrl);
-    }
-@endphp
-
-{{-- Header Section --}}
-<section class="bg-midnight-950 py-16 md:py-24 relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-midnight-900 to-midnight-950"></div>
-    @if($thumbUrl)
-        <div class="absolute inset-0 opacity-20">
-            <img src="{{ $thumbUrl }}" class="w-full h-full object-cover blur-sm" alt="Background">
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-t from-midnight-950 via-midnight-950/80 to-transparent"></div>
-    @endif
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gold-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-    
-    <div class="container relative z-10">
-        <div class="max-w-4xl mx-auto text-center">
-            @if($item->category)
-                <span class="inline-block px-4 py-1 bg-gold-500 text-midnight-950 text-xs font-bold uppercase tracking-widest rounded-full mb-6 shadow-lg shadow-gold-500/20">
-                    {{ $item->category->trans('name') }}
-                </span>
-            @endif
-            
-            <h1 class="text-3xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">{{ $item->trans('title') }}</h1>
-            
-            <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-300 font-medium">
-                <span class="flex items-center gap-2"><i class="far fa-calendar text-gold-500"></i> {{ \Carbon\Carbon::parse($item->published_at)->format('d M Y') }}</span>
-                <span class="flex items-center gap-2"><i class="far fa-eye text-gold-500"></i> {{ $item->view_count ?? 0 }} Views</span>
-            </div>
-        </div>
+{{-- ═══ HERO ═══ --}}
+<section class="relative bg-primary overflow-hidden">
+  <div class="dot-pattern absolute inset-0 pointer-events-none"></div>
+  @if($thumb)
+    <div class="absolute inset-0 opacity-15">
+      <img src="{{ $thumb }}" class="w-full h-full object-cover" alt="" />
     </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/70 to-primary/30"></div>
+  @endif
+  <div class="absolute -top-24 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+    {{-- Breadcrumb --}}
+    <div class="flex items-center gap-2 text-on-primary/60 text-xs mb-5">
+      <a href="{{ route('front.home') }}" class="hover:text-on-primary transition-colors">{{ $t('ໜ້າຫຼັກ','Home','首頁') }}</a>
+      <i class="fas fa-chevron-right text-[9px]"></i>
+      <a href="{{ route('front.news.index') }}" class="hover:text-on-primary transition-colors">{{ $t('ຂ່າວສານ','News','新聞') }}</a>
+      <i class="fas fa-chevron-right text-[9px]"></i>
+      <span class="text-on-primary/80 truncate max-w-[240px]">{{ $title }}</span>
+    </div>
+
+    <div class="max-w-3xl">
+      @if($catName)
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-secondary/90 text-on-secondary
+                     text-[10px] font-bold rounded-full mb-4">
+          <i class="fas fa-tag text-[8px]"></i>{{ $catName }}
+        </span>
+      @endif
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-on-primary leading-snug mb-4">
+        {{ $title }}
+      </h1>
+      <div class="flex flex-wrap items-center gap-4 text-on-primary/60 text-xs">
+        @if($item->published_at)
+          <span class="flex items-center gap-1.5">
+            <i class="far fa-calendar text-secondary text-sm"></i>
+            {{ $item->published_at->translatedFormat('d F Y') }}
+          </span>
+        @endif
+        @if($item->view_count)
+          <span class="flex items-center gap-1.5">
+            <i class="far fa-eye text-secondary text-sm"></i>
+            {{ number_format($item->view_count) }} {{ $t('ການເບິ່ງ','views','次') }}
+          </span>
+        @endif
+        @if($item->author)
+          <span class="flex items-center gap-1.5">
+            <i class="far fa-user text-secondary text-sm"></i>
+            {{ $item->author->name }}
+          </span>
+        @endif
+      </div>
+    </div>
+  </div>
 </section>
 
-{{-- Content Section --}}
-<section class="py-16 bg-slate-50 relative -mt-10 z-20">
-    <div class="container">
-        <div class="max-w-4xl mx-auto">
-            
-            <div class="bg-white rounded-2xl shadow-xl shadow-midnight-900/5 border border-slate-100 overflow-hidden">
-                @if($thumbUrl)
-                    <div class="w-full h-[400px] md:h-[500px]">
-                        <img src="{{ $thumbUrl }}" alt="{{ $item->trans('title') }}" class="w-full h-full object-cover">
+{{-- ═══ CONTENT ═══ --}}
+<section class="bg-slate-50 py-10">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_24px_-6px_rgba(0,0,0,.1)] overflow-hidden">
+        {{-- Hero image --}}
+        @if($thumb)
+          <div class="w-full aspect-[16/9] overflow-hidden">
+            <img src="{{ $thumb }}" alt="{{ $title }}" class="w-full h-full object-cover" />
+          </div>
+        @endif
+
+        {{-- Article body --}}
+        <div class="p-6 md:p-10">
+          @if($excerpt)
+            <p class="text-on-surface-variant font-medium text-sm leading-relaxed mb-6 border-l-4 border-secondary pl-4
+                       bg-secondary/5 py-3 pr-4 rounded-r-xl">
+              {{ $excerpt }}
+            </p>
+          @endif
+
+          <div class="prose-bfol">
+            {!! $content !!}
+          </div>
+        </div>
+
+        {{-- Tags --}}
+        @if($item->tags?->isNotEmpty())
+          <div class="px-6 md:px-10 pb-6 flex flex-wrap gap-2">
+            @foreach($item->tags as $tag)
+              <span class="px-3 py-1 bg-surface-container-low text-on-surface-variant text-xs font-semibold rounded-full border border-surface-container-high">
+                #{{ $tag->name_lo ?? $tag->name }}
+              </span>
+            @endforeach
+          </div>
+        @endif
+
+        {{-- Footer --}}
+        <div class="px-6 md:px-10 py-4 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-4">
+          <a href="{{ route('front.news.index') }}"
+             class="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant
+                    hover:text-primary transition-colors">
+            <i class="fas fa-arrow-left text-xs"></i>
+            {{ $t('ກັບຄືນ','Back to news','返回') }}
+          </a>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-outline uppercase tracking-wide">Share:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
+               target="_blank" rel="noreferrer"
+               class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors text-sm">
+              <i class="fab fa-facebook-f text-xs"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {{-- Related --}}
+      @if($related->isNotEmpty())
+        <div class="mt-10">
+          <h3 class="font-serif font-bold text-on-surface text-lg mb-5 flex items-center gap-2">
+            <i class="fas fa-newspaper text-secondary text-sm"></i>
+            {{ $t('ຂ່າວທີ່ກ່ຽວຂ້ອງ','Related News','相關新聞') }}
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @foreach($related as $rel)
+              @php
+                $rThumb = $rel->thumbnail;
+                if ($rThumb && !\Str::startsWith($rThumb, ['http','https','/storage'])) {
+                    $rThumb = \Illuminate\Support\Facades\Storage::url($rThumb);
+                }
+              @endphp
+              <a href="{{ route('front.news.show', $rel->slug) }}"
+                 class="group flex gap-4 bg-white rounded-2xl border border-slate-100 p-4
+                        hover:shadow-md hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-300">
+                <div class="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                  @if($rThumb)
+                    <img src="{{ $rThumb }}" alt="{{ $rel->trans('title') }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  @else
+                    <div class="w-full h-full bg-primary/8 flex items-center justify-center">
+                      <i class="fas fa-newspaper text-primary/20 text-xl"></i>
                     </div>
-                @endif
-                
-                <div class="p-8 md:p-12 prose prose-slate max-w-none prose-headings:font-serif prose-headings:text-midnight-950 prose-a:text-gold-600 hover:prose-a:text-gold-500 prose-img:rounded-xl">
-                    {!! $item->trans('content') !!}
+                  @endif
                 </div>
-                
-                <div class="p-8 md:p-12 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <a href="{{ route('front.news.index') }}" class="btn btn-outline">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to News
-                    </a>
-                    
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">Share:</span>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-midnight-900 hover:border-midnight-300 transition-colors shadow-sm"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-midnight-900 hover:border-midnight-300 transition-colors shadow-sm"><i class="fab fa-twitter"></i></a>
-                    </div>
+                <div class="min-w-0 flex-1">
+                  <h4 class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2 mb-1.5">
+                    {{ $rel->trans('title') }}
+                  </h4>
+                  @if($rel->published_at)
+                    <span class="text-[10px] text-outline flex items-center gap-1">
+                      <i class="far fa-calendar text-[9px]"></i>
+                      {{ $rel->published_at->translatedFormat('d M Y') }}
+                    </span>
+                  @endif
                 </div>
-            </div>
-            
+              </a>
+            @endforeach
+          </div>
         </div>
-    </div>
-</section>
+      @endif
 
-{{-- Related News Section --}}
-@if($related->isNotEmpty())
-<section class="py-16 bg-white border-t border-slate-200">
-    <div class="container">
-        <div class="max-w-4xl mx-auto">
-            <h3 class="text-2xl font-serif font-bold text-midnight-950 mb-8 flex items-center gap-3">
-                <i class="fas fa-newspaper text-gold-500"></i> Related News
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach($related as $rel)
-                    @php
-                        $relThumbUrl = $rel->thumbnail;
-                        if ($relThumbUrl && !\Illuminate\Support\Str::startsWith($relThumbUrl, ['http://', 'https://'])) {
-                            $relThumbUrl = \Illuminate\Support\Str::startsWith($relThumbUrl, '/storage/') 
-                                ? $relThumbUrl 
-                                : Storage::url($relThumbUrl);
-                        }
-                    @endphp
-                    <a href="{{ route('front.news.show', $rel->slug) }}" class="group flex gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 hover:shadow-md hover:border-midnight-200 transition-all">
-                        <div class="w-24 h-24 rounded-lg bg-slate-200 overflow-hidden shrink-0">
-                            @if($relThumbUrl)
-                                <img src="{{ $relThumbUrl }}" alt="{{ $rel->trans('title') }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-slate-400"><i class="fas fa-image"></i></div>
-                            @endif
-                        </div>
-                        <div class="flex flex-col justify-center">
-                            <h4 class="text-sm font-bold text-midnight-950 group-hover:text-gold-600 transition-colors line-clamp-2 mb-2">{{ $rel->trans('title') }}</h4>
-                            <span class="text-xs text-slate-400 font-medium"><i class="far fa-calendar mr-1"></i> {{ \Carbon\Carbon::parse($rel->published_at)->format('d M Y') }}</span>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
     </div>
+  </div>
 </section>
-@endif
 
 @endsection

@@ -8,7 +8,7 @@
     ['label' => $t('ກ່ຽວກັບ ອພສ','About BFOL','關於我們'), 'url' => null, 'items' => [
       ['icon'=>'fas fa-landmark',        'label'=>$t('ປະຫວັດຄວາມເປັນມາ','History','歷史'),     'url'=>'#'],
       ['icon'=>'fas fa-bullseye',        'label'=>$t('ວິສາຫະກິດ & ຄາລະກິດ','Mission','使命'),  'url'=>'#'],
-      ['icon'=>'fas fa-sitemap',         'label'=>$t('ໂຄງສ້າງອົງການ','Structure','組織結構'),   'url'=>'#'],
+      ['icon'=>'fas fa-sitemap',         'label'=>$t('ໂຄງສ້າງອົງການ','Structure','組織結構'),   'url'=>$R('structure')],
       ['icon'=>'fas fa-users',           'label'=>$t('ຄະນະກຳມະການ','Committee','委員會'),      'url'=>$R('committee')],
     ]],
     ['label' => $t('ດ້ານການສຶກສາ','Education','教育'), 'url' => null, 'items' => [
@@ -25,8 +25,8 @@
     ]],
     ['label' => $t('ສື່ສາ','Media','媒體'), 'url' => null, 'items' => [
       ['icon'=>'fab fa-youtube',         'label'=>'DhammaOnLen',                                 'url'=>'https://www.youtube.com/@DhammaOnLen','external'=>true],
-      ['icon'=>'fas fa-images',          'label'=>$t('ຮູບພາບ ກິດຈະກຳ','Gallery','活動相冊'),   'url'=>'#'],
-      ['icon'=>'fas fa-file-lines',      'label'=>$t('ເອກະສານ','Documents','文件'),              'url'=>'#'],
+      ['icon'=>'fas fa-images',          'label'=>$t('ຮູບພາບ ກິດຈະກຳ','Gallery','活動相冊'),   'url'=>$R('media.index')],
+      ['icon'=>'fas fa-file-lines',      'label'=>$t('ເອກະສານ','Documents','文件'),              'url'=>$R('documents.index')],
     ]],
     ['label' => $t('ຂ່າວສານ','News','新聞'),         'url' => $R('news.index'), 'items' => []],
     ['label' => $t('ຕິດຕໍ່','Contact','聯繫我們'),    'url' => $R('contact'),    'items' => []],

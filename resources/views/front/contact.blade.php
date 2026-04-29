@@ -1,173 +1,220 @@
 @extends('front.layouts.app')
 
-@section('title', __('app.contact.title') . ' - ' . __('app.site_name'))
+@php
+  $L = app()->getLocale();
+  $t = fn($lo,$en,$zh) => match($L){'zh'=>$zh,'en'=>$en,default=>$lo};
+
+  $address = \App\Models\SiteSetting::get('site_address_'.$L)
+          ?: \App\Models\SiteSetting::get('site_address_lo');
+  $email   = \App\Models\SiteSetting::get('site_email');
+  $phone   = \App\Models\SiteSetting::get('site_phone');
+@endphp
+
+@section('title', $t('ຕິດຕໍ່ພວກເຮົາ','Contact Us','聯繫我們').' - '.($settings->site_name_lo ?: 'BFOL'))
+@section('meta_description', $t('ຕິດຕໍ່ ສ.ຊ.ພ.ລ','Contact BFOL','聯繫老撾佛協'))
+
+@push('styles')
+<style>
+  .dot-pattern { background-image:radial-gradient(circle,rgba(255,255,255,.12) 1px,transparent 1px); background-size:28px 28px; }
+  input:focus,textarea:focus,select:focus { outline:none; }
+</style>
+@endpush
 
 @section('content')
 
-{{-- Header Section --}}
-<section class="bg-midnight-950 py-16 md:py-24 relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-midnight-900 to-midnight-950"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gold-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-    
-    <div class="container relative z-10 text-center max-w-3xl mx-auto">
-        <h1 class="text-4xl md:text-5xl font-serif font-bold text-white mb-6">{{ __('app.contact.title') ?? 'Contact Us' }}</h1>
-        <p class="text-lg text-slate-300">Get in touch with the Lao Buddhist Association Foreign Affairs Committee. We are here to answer your questions and hear your suggestions.</p>
-    </div>
+{{-- ═══ HERO ═══ --}}
+<section class="relative bg-primary overflow-hidden">
+  <div class="dot-pattern absolute inset-0 pointer-events-none"></div>
+  <div class="absolute -top-24 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 text-center">
+    <h1 class="text-3xl sm:text-4xl font-serif font-bold text-on-primary mb-3">
+      {{ $t('ຕິດຕໍ່ພວກເຮົາ','Contact Us','聯繫我們') }}
+    </h1>
+    <p class="text-on-primary/70 text-sm max-w-lg mx-auto">
+      {{ $t(
+        'ຕິດຕໍ່ ສ.ຊ.ພ.ລ — ພວກເຮົາຍິນດີ ຮັບຟັງ ຄຳຖາມ ແລະ ຄຳສະເໜີ ຂອງທ່ານ',
+        'Get in touch with BFOL — we are happy to answer your questions and suggestions.',
+        '聯繫老撾佛協，我們樂意回答您的問題和建議。'
+      ) }}
+    </p>
+  </div>
 </section>
 
-{{-- Content Section --}}
-<section class="py-16 bg-slate-50 relative -mt-10 z-20">
-    <div class="container max-w-6xl mx-auto">
-        
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            
-            {{-- Contact Information Cards --}}
-            <div class="lg:col-span-2 flex flex-col gap-6">
-                
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-midnight-900/5 border border-slate-100 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-gold-500/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                    <div class="w-12 h-12 rounded-xl bg-midnight-50 text-midnight-600 flex items-center justify-center text-xl mb-6">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-midnight-950 mb-2">Our Location</h3>
-                    <p class="text-slate-500 leading-relaxed">
-                        {{ \App\Models\SiteSetting::get('site_address_'.app()->getLocale()) ?? \App\Models\SiteSetting::get('site_address_lo') ?? 'Vientiane, Lao PDR' }}
-                    </p>
-                </div>
-                
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-midnight-900/5 border border-slate-100 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-gold-500/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                    <div class="w-12 h-12 rounded-xl bg-midnight-50 text-midnight-600 flex items-center justify-center text-xl mb-6">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-midnight-950 mb-2">Email Address</h3>
-                    <p class="text-slate-500 leading-relaxed">
-                        <a href="mailto:{{ \App\Models\SiteSetting::get('site_email') }}" class="hover:text-gold-600 transition-colors">
-                            {{ \App\Models\SiteSetting::get('site_email') }}
-                        </a>
-                    </p>
-                </div>
-                
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-midnight-900/5 border border-slate-100 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-gold-500/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                    <div class="w-12 h-12 rounded-xl bg-midnight-50 text-midnight-600 flex items-center justify-center text-xl mb-6">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-midnight-950 mb-2">Phone Number</h3>
-                    <p class="text-slate-500 leading-relaxed">
-                        <a href="tel:{{ \App\Models\SiteSetting::get('site_phone') }}" class="hover:text-gold-600 transition-colors">
-                            {{ \App\Models\SiteSetting::get('site_phone') }}
-                        </a>
-                    </p>
-                </div>
-                
+{{-- ═══ CONTENT ═══ --}}
+<section class="bg-slate-50 py-10">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      {{-- ── Info cards ── --}}
+      <div class="lg:col-span-2 flex flex-col gap-4">
+        @foreach([
+          ['icon'=>'fas fa-map-marker-alt', 'title'=>$t('ທີ່ຢູ່','Address','地址'),        'val'=>$address],
+          ['icon'=>'fas fa-envelope',       'title'=>$t('ອີເມວ','Email','電子郵件'),        'val'=>$email,  'href'=>"mailto:$email"],
+          ['icon'=>'fas fa-phone-alt',      'title'=>$t('ໂທລະສັບ','Phone','電話'),          'val'=>$phone,  'href'=>"tel:$phone"],
+        ] as $info)
+          @if($info['val'])
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,.08)] p-5
+                        flex items-start gap-4 hover:shadow-md transition-shadow">
+              <div class="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center shrink-0">
+                <i class="{{ $info['icon'] }} text-primary text-sm"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-outline uppercase tracking-wide mb-0.5">{{ $info['title'] }}</p>
+                @if(!empty($info['href']))
+                  <a href="{{ $info['href'] }}"
+                     class="text-sm font-semibold text-on-surface hover:text-primary transition-colors">
+                    {{ $info['val'] }}
+                  </a>
+                @else
+                  <p class="text-sm font-semibold text-on-surface leading-snug">{{ $info['val'] }}</p>
+                @endif
+              </div>
             </div>
-            
-            {{-- Contact Form --}}
-            <div class="lg:col-span-3">
-                <div class="bg-white rounded-2xl p-8 md:p-12 shadow-xl shadow-midnight-900/5 border border-slate-100 h-full">
-                    
-                    <div class="mb-8">
-                        <h2 class="text-2xl font-serif font-bold text-midnight-950 mb-2">Send us a message</h2>
-                        <p class="text-slate-500">Fill out the form below and our team will get back to you as soon as possible.</p>
-                    </div>
+          @endif
+        @endforeach
 
-                    @if(session('success'))
-                        <div class="mb-8 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 flex items-start gap-3">
-                            <i class="fas fa-check-circle mt-1 text-green-500"></i>
-                            <div>
-                                <h4 class="font-bold">Message Sent!</h4>
-                                <p class="text-sm mt-1">{{ session('success') }}</p>
-                            </div>
-                        </div>
-                    @endif
+        {{-- Social --}}
+        @php
+          $facebook  = \App\Models\SiteSetting::get('social_facebook');
+          $youtube   = \App\Models\SiteSetting::get('social_youtube');
+        @endphp
+        @if($facebook || $youtube)
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,.08)] p-5">
+            <p class="text-[10px] font-bold text-outline uppercase tracking-wide mb-3">{{ $t('ສັງຄົມອອນລາຍ','Social Media','社交媒體') }}</p>
+            <div class="flex gap-3">
+              @if($facebook)
+                <a href="{{ $facebook }}" target="_blank" rel="noreferrer"
+                   class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+                  <i class="fab fa-facebook-f text-sm"></i>
+                </a>
+              @endif
+              @if($youtube)
+                <a href="{{ $youtube }}" target="_blank" rel="noreferrer"
+                   class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors">
+                  <i class="fab fa-youtube text-sm"></i>
+                </a>
+              @endif
+            </div>
+          </div>
+        @endif
+      </div>
 
-                    <form action="{{ route('front.contact.submit') }}" method="POST" class="space-y-6">
-                        @csrf
-                        <input type="hidden" name="language" value="{{ app()->getLocale() }}">
+      {{-- ── Contact form ── --}}
+      <div class="lg:col-span-3">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,.08)] p-6 md:p-8">
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Name --}}
-                            <div>
-                                <label class="block text-sm font-bold text-midnight-950 mb-2">{{ __('app.contact.name') ?? 'Full Name' }} <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <input type="text" name="name" value="{{ old('name') }}" required
-                                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-midnight-500 focus:ring-2 focus:ring-midnight-500/20 transition-all outline-none @error('name') border-red-500 focus:border-red-500 focus:ring-red-500/20 @enderror"
-                                        placeholder="John Doe">
-                                </div>
-                                @error('name')<p class="mt-2 text-xs text-red-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
-                            </div>
+          <h2 class="font-serif font-bold text-on-surface text-xl mb-1">
+            {{ $t('ສົ່ງຂໍ້ຄວາມ','Send us a message','發送訊息') }}
+          </h2>
+          <p class="text-sm text-outline mb-6">
+            {{ $t('ຂໍ້ຄວາມຂອງທ່ານ ຈະຖືກຕອບກັບ ໂດຍໄວ','We will reply as soon as possible.','我們將盡快回覆。') }}
+          </p>
 
-                            {{-- Email --}}
-                            <div>
-                                <label class="block text-sm font-bold text-midnight-950 mb-2">{{ __('app.contact.email') ?? 'Email Address' }} <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
-                                    <input type="email" name="email" value="{{ old('email') }}" required
-                                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-midnight-500 focus:ring-2 focus:ring-midnight-500/20 transition-all outline-none @error('email') border-red-500 focus:border-red-500 focus:ring-red-500/20 @enderror"
-                                        placeholder="john@example.com">
-                                </div>
-                                @error('email')<p class="mt-2 text-xs text-red-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
-                            </div>
-                        </div>
+          @if(session('success'))
+            <div class="flex items-start gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 mb-6 text-sm">
+              <i class="fas fa-check-circle text-green-500 mt-0.5 shrink-0"></i>
+              <p>{{ session('success') }}</p>
+            </div>
+          @endif
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Phone --}}
-                            <div>
-                                <label class="block text-sm font-bold text-midnight-950 mb-2">{{ __('app.contact.phone') ?? 'Phone Number' }}</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fas fa-phone-alt"></i>
-                                    </div>
-                                    <input type="text" name="phone" value="{{ old('phone') }}"
-                                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-midnight-500 focus:ring-2 focus:ring-midnight-500/20 transition-all outline-none"
-                                        placeholder="+856 20...">
-                                </div>
-                            </div>
+          @if($errors->any())
+            <div class="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">
+              <i class="fas fa-exclamation-circle text-red-500 mt-0.5 shrink-0"></i>
+              <ul class="list-disc list-inside space-y-0.5">
+                @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+              </ul>
+            </div>
+          @endif
 
-                            {{-- Subject --}}
-                            <div>
-                                <label class="block text-sm font-bold text-midnight-950 mb-2">{{ __('app.contact.subject') ?? 'Subject' }}</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fas fa-tag"></i>
-                                    </div>
-                                    <input type="text" name="subject" value="{{ old('subject') }}"
-                                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-midnight-500 focus:ring-2 focus:ring-midnight-500/20 transition-all outline-none"
-                                        placeholder="How can we help?">
-                                </div>
-                            </div>
-                        </div>
+          <form action="{{ route('front.contact.submit') }}" method="POST" class="space-y-4">
+            @csrf
+            <input type="hidden" name="language" value="{{ $L }}">
 
-                        {{-- Message --}}
-                        <div>
-                            <label class="block text-sm font-bold text-midnight-950 mb-2">{{ __('app.contact.message') ?? 'Your Message' }} <span class="text-red-500">*</span></label>
-                            <textarea name="message" rows="5" required
-                                class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-midnight-500 focus:ring-2 focus:ring-midnight-500/20 transition-all outline-none resize-none @error('message') border-red-500 focus:border-red-500 focus:ring-red-500/20 @enderror"
-                                placeholder="Type your message here...">{{ old('message') }}</textarea>
-                            @error('message')<p class="mt-2 text-xs text-red-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
-                        </div>
-
-                        {{-- Submit Button --}}
-                        <div class="pt-4 flex justify-end">
-                            <button type="submit" class="btn btn-primary px-8 py-3 group">
-                                <span>{{ __('app.btn.submit') ?? 'Send Message' }}</span>
-                                <i class="fas fa-paper-plane ml-2 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
-                            </button>
-                        </div>
-                    </form>
-
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {{-- Name --}}
+              <div>
+                <label class="block text-xs font-bold text-on-surface-variant mb-1.5">
+                  {{ $t('ຊື່-ນາມສະກຸນ','Full Name','姓名') }} <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none"></i>
+                  <input type="text" name="name" value="{{ old('name') }}" required
+                         placeholder="{{ $t('ຊື່ ນາມສະກຸນ','Your name','您的姓名') }}"
+                         class="w-full pl-9 pr-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                                focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors
+                                @error('name') border-red-300 @enderror" />
                 </div>
+              </div>
+
+              {{-- Email --}}
+              <div>
+                <label class="block text-xs font-bold text-on-surface-variant mb-1.5">
+                  {{ $t('ອີເມວ','Email','電子郵件') }} <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none"></i>
+                  <input type="email" name="email" value="{{ old('email') }}" required
+                         placeholder="email@example.com"
+                         class="w-full pl-9 pr-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                                focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors
+                                @error('email') border-red-300 @enderror" />
+                </div>
+              </div>
             </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {{-- Phone --}}
+              <div>
+                <label class="block text-xs font-bold text-on-surface-variant mb-1.5">{{ $t('ໂທລະສັບ','Phone','電話') }}</label>
+                <div class="relative">
+                  <i class="fas fa-phone-alt absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none"></i>
+                  <input type="text" name="phone" value="{{ old('phone') }}"
+                         placeholder="+856 20..."
+                         class="w-full pl-9 pr-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                                focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors" />
+                </div>
+              </div>
+
+              {{-- Subject --}}
+              <div>
+                <label class="block text-xs font-bold text-on-surface-variant mb-1.5">{{ $t('ຫົວຂໍ້','Subject','主題') }}</label>
+                <div class="relative">
+                  <i class="fas fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none"></i>
+                  <input type="text" name="subject" value="{{ old('subject') }}"
+                         placeholder="{{ $t('ຫົວຂໍ້ຂໍ້ຄວາມ','Subject','主題') }}"
+                         class="w-full pl-9 pr-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                                focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors" />
+                </div>
+              </div>
+            </div>
+
+            {{-- Message --}}
+            <div>
+              <label class="block text-xs font-bold text-on-surface-variant mb-1.5">
+                {{ $t('ຂໍ້ຄວາມ','Message','訊息') }} <span class="text-red-500">*</span>
+              </label>
+              <textarea name="message" rows="5" required
+                        placeholder="{{ $t('ພິມຂໍ້ຄວາມຂອງທ່ານ...','Type your message here...','在此輸入您的訊息...') }}"
+                        class="w-full px-3 py-2.5 text-sm bg-surface-container-low border border-surface-container-high rounded-lg
+                               focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors resize-y
+                               @error('message') border-red-300 @enderror">{{ old('message') }}</textarea>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button type="submit"
+                      class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold text-sm rounded-xl
+                             hover:bg-secondary hover:text-on-secondary hover:shadow-lg
+                             active:scale-[0.98] transition-all duration-200 group">
+                <span>{{ $t('ສົ່ງຂໍ້ຄວາມ','Send Message','發送') }}</span>
+                <i class="fas fa-paper-plane text-xs group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform"></i>
+              </button>
+            </div>
+          </form>
         </div>
-        
+      </div>
+
     </div>
+  </div>
 </section>
 
 @endsection

@@ -59,7 +59,11 @@
   <select name="department" class="text-sm bg-surface-container-lowest border border-surface-container-high rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[160px]">
     <option value="">ທຸກພະແນກ</option>
     @foreach($departments as $dept)
-      <option value="{{ $dept->id }}" @selected(request('department') == $dept->id)>{{ $dept->name_lo }}</option>
+      <option value="{{ $dept['id'] }}"
+              @selected(request('department') == $dept['id'])
+              style="{{ $dept['depth'] > 0 ? 'padding-left:1.25rem;color:#64748b;' : 'font-weight:600;' }}">
+        {{ $dept['depth'] > 0 ? '↳ ' : '' }}{{ $dept['label'] }}
+      </option>
     @endforeach
   </select>
   <button type="submit" class="px-4 py-2 text-sm font-semibold primary-gradient text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap">

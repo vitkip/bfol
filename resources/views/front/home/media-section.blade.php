@@ -80,8 +80,9 @@
       </div>
 
       {{-- Documents --}}
-      <div class="min-h-[160px] md:min-h-0 group relative rounded-lg overflow-hidden
-                  bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
+      <a href="{{ route('front.documents.index') }}"
+         class="min-h-[160px] md:min-h-0 group relative rounded-lg overflow-hidden
+                bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
         <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
           <i class="fas fa-file-lines text-on-primary/30 text-5xl
                     group-hover:scale-110 transition-transform duration-300 group-hover:text-secondary"></i>
@@ -89,7 +90,7 @@
             {{ $t('ເອກະສານ & PDF','Documents & PDF','文件與PDF') }}
           </p>
         </div>
-      </div>
+      </a>
 
     </div>
 
@@ -99,7 +100,7 @@
         ['icon'=>'fab fa-youtube',    'label'=>'YouTube',  'sub'=>$ytHandle, 'color'=>'text-red-400',  'href'=>$ytUrl],
         ['icon'=>'fab fa-facebook-f', 'label'=>'Facebook', 'sub'=>$fbHandle, 'color'=>'text-blue-400', 'href'=>$fbUrl],
         ['icon'=>'fas fa-images',     'label'=>$t('ຮູບພາບ','Gallery','相冊'), 'sub'=>$t('ກິດຈະກຳ','Activities','活動'), 'color'=>'text-secondary','href'=>'#'],
-        ['icon'=>'fas fa-file-lines', 'label'=>$t('ເອກະສານ','Documents','文件'),'sub'=>$t('PDF & ໄຟລ໌','PDF & Files','PDF文件'),'color'=>'text-secondary','href'=>'#'],
+        ['icon'=>'fas fa-file-lines', 'label'=>$t('ເອກະສານ','Documents','文件'),'sub'=>$t('PDF & ໄຟລ໌','PDF & Files','PDF文件'),'color'=>'text-secondary','href'=>route('front.documents.index')],
       ] as $m)
         <a href="{{ $m['href'] }}"
            @if(str_starts_with($m['href'],'http')) target="_blank" rel="noreferrer" @endif
