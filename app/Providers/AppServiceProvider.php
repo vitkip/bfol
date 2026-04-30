@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Share $settings and $locale with every front.* Blade view
         \Illuminate\Support\Facades\View::composer('front.*', function ($view) {
-            static $settings = null;
+            static $settings     = null;
+            static $bannersByPos = null;
+
             if ($settings === null) {
                 $keys = [
                     'site_name_lo','site_name_en','site_name_zh',
@@ -36,8 +38,18 @@ class AppServiceProvider extends ServiceProvider
                 }
                 $settings = (object) $data;
             }
+
+            if ($bannersByPos === null) {
+                $bannersByPos = \App\Models\Banner::active()
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->get()
+                    ->groupBy('position');
+            }
+
             $view->with('settings', $settings)
-                 ->with('locale', app()->getLocale());
+                 ->with('locale', app()->getLocale())
+                 ->with('bannersByPos', $bannersByPos);
         });
     }
 }

@@ -34,12 +34,15 @@
 
   @include('front._partials.topbar')
   @include('front._partials.navbar')
+  @include('front._partials.banner', ['position' => 'top'])
 
   <main id="main-content" class="flex-1 w-full flex flex-col">
     @yield('content')
   </main>
 
+  @include('front._partials.banner', ['position' => 'bottom'])
   @include('front._partials.footer')
+  @include('front._partials.banner', ['position' => 'popup'])
 
   {{-- Back to top --}}
   <div x-data="{ show: false }"

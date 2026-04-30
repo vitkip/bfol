@@ -40,9 +40,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // ─── ADMIN PANEL (protected) ──────────────────────────────────────────────────
+// Base middleware: must be logged in + have any valid admin role (viewer+)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->group(function () {
+
+    // Dashboard — all roles
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // ── CONTENT (editor, admin, superadmin can write; viewer read-only) ──────
     Route::resource('news',          AdminNews::class);
     Route::resource('events',        AdminEvent::class);
     Route::resource('event_tags',    \App\Http\Controllers\Admin\EventTagController::class);
@@ -54,17 +58,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('mou',           AdminMou::class);
     Route::resource('monk-programs', AdminMonkProgram::class);
     Route::resource('aid-projects',  AdminAidProject::class);
-    Route::resource('committee',     AdminCommittee::class);
-    Route::resource('departments',   AdminDepartment::class);
-    Route::resource('slides',        AdminSlide::class);
-    Route::resource('banners',       AdminBanner::class);
-    Route::resource('contacts',      AdminContact::class)->only(['index','show','destroy']);
-    Route::patch('contacts/{contact}/read', [AdminContact::class, 'markRead'])->name('contacts.read');
     Route::resource('tags',          \App\Http\Controllers\Admin\TagController::class);
     Route::resource('categories',    \App\Http\Controllers\Admin\CategoryController::class);
-    Route::resource('users',         AdminUser::class);
-    Route::resource('settings',      AdminSetting::class)->only(['index','store']);
-    Route::resource('navigation',    AdminNavigation::class)->except(['show']);
+    Route::resource('contacts',      AdminContact::class)->only(['index','show','destroy']);
+    Route::patch('contacts/{contact}/read', [AdminContact::class, 'markRead'])->name('contacts.read');
+
+    // ── ORG / SITE CONFIG (admin+ only) ──────────────────────────────────────
+    Route::middleware('admin.role:admin')->group(function () {
+        Route::resource('committee',   AdminCommittee::class);
+        Route::resource('departments', AdminDepartment::class);
+        Route::resource('slides',      AdminSlide::class);
+        Route::resource('banners',     AdminBanner::class);
+        Route::resource('navigation',  AdminNavigation::class)->except(['show']);
+    });
+
+    // ── SYSTEM (superadmin only) ──────────────────────────────────────────────
+    Route::middleware('admin.role:superadmin')->group(function () {
+        Route::resource('users',    AdminUser::class);
+        Route::resource('settings', AdminSetting::class)->only(['index','store']);
+    });
 });
 
 // ─── LANGUAGE SWITCHER ────────────────────────────────────────────────────────

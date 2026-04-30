@@ -103,6 +103,7 @@
     </div>
 
     {{-- Nav --}}
+    @php $me = auth()->user(); @endphp
     <nav class="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 text-sm">
 
       <a href="{{ route('admin.dashboard') }}"
@@ -110,6 +111,7 @@
         <i class="fas fa-tachometer-alt w-4 text-center text-xs"></i><span>Dashboard</span>
       </a>
 
+      {{-- ── CONTENT: viewer+ ── --}}
       <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ເນື້ອຫາ</p>
       @foreach([
             ['admin.news.*',      route('admin.news.index'),      'fa-newspaper',   'ຂ່າວສານ'],
@@ -126,12 +128,13 @@
         </a>
       @endforeach
 
+      {{-- ── MISSION: viewer+ ── --}}
       <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ພາລະກິດ</p>
       @foreach([
-          ['admin.partners.*',      route('admin.partners.index'),      'fa-globe',         'ຄູ່ຮ່ວມມື'],
+          ['admin.partners.*',      route('admin.partners.index'),      'fa-globe',          'ຄູ່ຮ່ວມມື'],
           ['admin.mou.*',           route('admin.mou.index'),           'fa-file-signature', 'MOU'],
-          ['admin.monk-programs.*', route('admin.monk-programs.index'), 'fa-exchange-alt',  'ແລກປ່ຽນພຣະ'],
-          ['admin.aid-projects.*',  route('admin.aid-projects.index'),  'fa-hands-helping', 'ຊ່ວຍເຫຼືອ'],
+          ['admin.monk-programs.*', route('admin.monk-programs.index'), 'fa-exchange-alt',   'ແລກປ່ຽນພຣະ'],
+          ['admin.aid-projects.*',  route('admin.aid-projects.index'),  'fa-hands-helping',  'ຊ່ວຍເຫຼືອ'],
         ] as [$route, $url, $icon, $label])
         <a href="{{ $url }}"
            class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
@@ -139,19 +142,24 @@
         </a>
       @endforeach
 
-      <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ໜ້າຫຼັກ</p>
-      @foreach([
-          ['admin.navigation.*', route('admin.navigation.index'), 'fa-bars',   'ຈັດການເມນູ'],
-          ['admin.slides.*',     route('admin.slides.index'),     'fa-images', 'Slides'],
-          ['admin.banners.*',    route('admin.banners.index'),    'fa-ad',     'Banners'],
-          ['admin.committee.*',  route('admin.committee.index'),  'fa-users',  'ຄະນະກໍາມະການ'],
-        ] as [$route, $url, $icon, $label])
-        <a href="{{ $url }}"
-           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
-          <i class="fas {{ $icon }} w-4 text-center text-xs"></i><span>{{ $label }}</span>
-        </a>
-      @endforeach
+      {{-- ── ORG / SITE CONFIG: admin+ only ── --}}
+      @if($me->isAdmin())
+        <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ໜ້າຫຼັກ</p>
+        @foreach([
+            ['admin.navigation.*', route('admin.navigation.index'), 'fa-bars',   'ຈັດການເມນູ'],
+            ['admin.slides.*',     route('admin.slides.index'),     'fa-images', 'Slides'],
+            ['admin.banners.*',    route('admin.banners.index'),    'fa-ad',     'Banners'],
+            ['admin.committee.*',  route('admin.committee.index'),  'fa-users',  'ຄະນະກໍາມະການ'],
+            ['admin.departments.*',route('admin.departments.index'),'fa-sitemap','ພະແນກ'],
+          ] as [$route, $url, $icon, $label])
+          <a href="{{ $url }}"
+             class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
+            <i class="fas {{ $icon }} w-4 text-center text-xs"></i><span>{{ $label }}</span>
+          </a>
+        @endforeach
+      @endif
 
+      {{-- ── SYSTEM: always show header, conditionally show links ── --}}
       <p class="px-3 pt-4 pb-1 text-[10px] font-bold text-outline uppercase tracking-widest">ລະບົບ</p>
 
       <a href="{{ route('admin.contacts.index') }}"
@@ -164,27 +172,38 @@
         @endif
       </a>
 
-      @foreach([
-          ['admin.users.*',    route('admin.users.index'),    'fa-user-cog', 'ຜູ້ໃຊ້'],
-          ['admin.settings.*', route('admin.settings.index'), 'fa-cog',      'ຕັ້ງຄ່າ'],
-        ] as [$route, $url, $icon, $label])
-        <a href="{{ $url }}"
-           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
-          <i class="fas {{ $icon }} w-4 text-center text-xs"></i><span>{{ $label }}</span>
-        </a>
-      @endforeach
+      @if($me->isSuperAdmin())
+        @foreach([
+            ['admin.users.*',    route('admin.users.index'),    'fa-user-cog', 'ຜູ້ໃຊ້'],
+            ['admin.settings.*', route('admin.settings.index'), 'fa-cog',      'ຕັ້ງຄ່າ'],
+          ] as [$route, $url, $icon, $label])
+          <a href="{{ $url }}"
+             class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
+            <i class="fas {{ $icon }} w-4 text-center text-xs"></i><span>{{ $label }}</span>
+          </a>
+        @endforeach
+      @endif
 
     </nav>
 
     {{-- User footer --}}
+    @php
+      $roleBadge = [
+        'superadmin' => ['bg-red-100 text-red-700',    'SuperAdmin'],
+        'admin'      => ['bg-primary/10 text-primary',  'Admin'],
+        'editor'     => ['bg-emerald-100 text-emerald-700', 'Editor'],
+        'viewer'     => ['bg-slate-100 text-slate-500', 'Viewer'],
+      ];
+      [$badgeClass, $badgeLabel] = $roleBadge[$me->role] ?? ['bg-slate-100 text-slate-500', $me->role];
+    @endphp
     <div class="flex-shrink-0 px-4 py-4 border-t border-surface-container-high">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 primary-gradient rounded-full flex items-center justify-center flex-shrink-0">
-          <span class="text-white text-xs font-bold">{{ mb_substr(auth()->user()->full_name_lo, 0, 1) }}</span>
+          <span class="text-white text-xs font-bold">{{ mb_substr($me->full_name_lo, 0, 1) }}</span>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-xs font-semibold text-on-surface truncate">{{ auth()->user()->full_name_lo }}</p>
-          <p class="text-[10px] text-outline truncate">{{ auth()->user()->role }}</p>
+          <p class="text-xs font-semibold text-on-surface truncate">{{ $me->full_name_lo }}</p>
+          <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded {{ $badgeClass }}">{{ $badgeLabel }}</span>
         </div>
         <form method="POST" action="{{ route('admin.logout') }}">
           @csrf
