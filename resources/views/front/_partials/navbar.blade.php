@@ -3,34 +3,68 @@
   $t = fn($lo,$en,$zh) => match($L){'zh'=>$zh,'en'=>$en,default=>$lo};
   $R = fn($name,...$p) => route('front.'.$name,...$p);
 
-  $menu = [
-    ['label' => $t('ໜ້າຫຼັກ','Home','首頁'),        'url' => $R('home'),       'items' => []],
-    ['label' => $t('ກ່ຽວກັບ ອພສ','About BFOL','關於我們'), 'url' => null, 'items' => [
-      ['icon'=>'fas fa-landmark',        'label'=>$t('ປະຫວັດຄວາມເປັນມາ','History','歷史'),     'url'=>'#'],
-      ['icon'=>'fas fa-bullseye',        'label'=>$t('ວິສາຫະກິດ & ຄາລະກິດ','Mission','使命'),  'url'=>'#'],
-      ['icon'=>'fas fa-sitemap',         'label'=>$t('ໂຄງສ້າງອົງການ','Structure','組織結構'),   'url'=>$R('structure')],
-      ['icon'=>'fas fa-users',           'label'=>$t('ຄະນະກຳມະການ','Committee','委員會'),      'url'=>$R('committee')],
-    ]],
-    ['label' => $t('ດ້ານການສຶກສາ','Education','教育'), 'url' => null, 'items' => [
-      ['icon'=>'fas fa-dharmachakra',    'label'=>$t('ຮຽນ ສີລ ສະມາທິ ທັມ','Sila & Dhamma','戒定慧'), 'url'=>'#'],
-      ['icon'=>'fas fa-chalkboard-teacher','label'=>$t('ດ້ານການສອນ','Teaching','教學'),         'url'=>'#'],
-      ['icon'=>'fas fa-microscope',      'label'=>$t('ທັດທະ & ວິໄຊ','Research','研究'),        'url'=>'#'],
-      ['icon'=>'fas fa-hands-helping',   'label'=>$t('ສາສາ & ສັງຄົມ','Society','社會'),        'url'=>'#'],
-    ]],
-    ['label' => $t('ການຕ່າງປະເທດ','International','國際關係'), 'url' => null, 'items' => [
-      ['icon'=>'fas fa-globe-asia',      'label'=>$t('ການທູດສາສາ','Diplomacy','宗教外交'),      'url'=>'#'],
-      ['icon'=>'fas fa-exchange-alt',    'label'=>$t('ແລກປ່ຽນ ສາກົນ','Exchange','國際交流'),   'url'=>'#'],
-      ['icon'=>'fas fa-file-signature',  'label'=>$t('MOU ຕ່າງປະເທດ','MOU','MOU協議'),         'url'=>'#'],
-      ['icon'=>'fas fa-hand-holding-heart','label'=>$t('ໂຄງການ ຊ່ວຍເຫຼືອ','Aid Projects','援助項目'),'url'=>'#'],
-    ]],
-    ['label' => $t('ສື່ສາ','Media','媒體'), 'url' => null, 'items' => [
-      ['icon'=>'fab fa-youtube',         'label'=>'DhammaOnLen',                                 'url'=>'https://www.youtube.com/@DhammaOnLen','external'=>true],
-      ['icon'=>'fas fa-images',          'label'=>$t('ຮູບພາບ ກິດຈະກຳ','Gallery','活動相冊'),   'url'=>$R('media.index')],
-      ['icon'=>'fas fa-file-lines',      'label'=>$t('ເອກະສານ','Documents','文件'),              'url'=>$R('documents.index')],
-    ]],
-    ['label' => $t('ຂ່າວສານ','News','新聞'),         'url' => $R('news.index'), 'items' => []],
-    ['label' => $t('ຕິດຕໍ່','Contact','聯繫我們'),    'url' => $R('contact'),    'items' => []],
-  ];
+  // ─── Build menu from DB (navigation_menus table) if admin has set items ────
+  // $navMenus is shared by AppServiceProvider to all front.* views.
+  // If the table has entries, use them. Otherwise fall back to the hardcoded default.
+
+  $buildMenuFromDb = function() use ($L, $t) {
+    $dbMenus = $GLOBALS['navMenus'] ?? null;
+    // $navMenus is a Blade variable — access via the view's data
+    return null; // signal: use the Blade variable path below
+  };
+
+  $labelFn = fn($m) => match($L) {
+    'zh'    => $m->label_zh ?: $m->label_lo,
+    'en'    => $m->label_en ?: $m->label_lo,
+    default => $m->label_lo,
+  };
+
+  $isExternal = fn($m) => $m->target === '_blank' || str_starts_with((string)$m->url, 'http');
+
+  if (isset($navMenus) && $navMenus->isNotEmpty()) {
+    // ─── DB-driven menu ────────────────────────────────────────────────────
+    $menu = $navMenus->map(fn($m) => [
+      'label'    => $labelFn($m),
+      'url'      => $m->url ?: null,
+      'external' => $isExternal($m),
+      'items'    => $m->children->map(fn($c) => [
+        'icon'     => $c->icon ?: 'fas fa-circle',
+        'label'    => $labelFn($c),
+        'url'      => $c->url ?: '#',
+        'external' => $isExternal($c),
+      ])->all(),
+    ])->all();
+  } else {
+    // ─── Hardcoded default (shown until admin adds items via ຈັດການເມນູ) ───
+    $menu = [
+      ['label' => $t('ໜ້າຫຼັກ','Home','首頁'),        'url' => $R('home'),       'items' => []],
+      ['label' => $t('ກ່ຽວກັບ ອພສ','About BFOL','關於我們'), 'url' => null, 'items' => [
+        ['icon'=>'fas fa-landmark',          'label'=>$t('ປະຫວັດຄວາມເປັນມາ','History','歷史'),   'url'=>$R('page.show','history')],
+        ['icon'=>'fas fa-bullseye',          'label'=>$t('ວິໄສທັດ & ພັນທະກິດ','Mission','使命'),'url'=>$R('page.show','mission')],
+        ['icon'=>'fas fa-sitemap',           'label'=>$t('ໂຄງສ້າງອົງການ','Structure','組織結構'), 'url'=>$R('structure')],
+        ['icon'=>'fas fa-users',             'label'=>$t('ຄະນະກຳມະການ','Committee','委員會'),    'url'=>$R('committee')],
+      ]],
+      ['label' => $t('ດ້ານການສຶກສາ','Education','教育'), 'url' => null, 'items' => [
+        ['icon'=>'fas fa-dharmachakra',      'label'=>$t('ຮຽນສີລສະມາທິທັມ','Sila & Dhamma','戒定慧'),'url'=>$R('page.show','sila-dhamma')],
+        ['icon'=>'fas fa-chalkboard-teacher','label'=>$t('ດ້ານການສອນ','Teaching','教學'),         'url'=>$R('page.show','teaching')],
+        ['icon'=>'fas fa-microscope',        'label'=>$t('ທັດທະ & ວິໄຊ','Research','研究'),      'url'=>$R('page.show','research')],
+        ['icon'=>'fas fa-hands-helping',     'label'=>$t('ສາສາ & ສັງຄົມ','Society','社會'),      'url'=>$R('page.show','society')],
+      ]],
+      ['label' => $t('ການຕ່າງປະເທດ','International','國際關係'), 'url' => null, 'items' => [
+        ['icon'=>'fas fa-globe-asia',        'label'=>$t('ຄູ່ຮ່ວມມືສາກົນ','Partners','國際合作夥伴'),   'url'=>$R('partners.index')],
+        ['icon'=>'fas fa-exchange-alt',      'label'=>$t('ແລກປ່ຽນ ສາກົນ','Exchange','國際交流'),         'url'=>$R('monk-programs.index')],
+        ['icon'=>'fas fa-file-signature',    'label'=>$t('MOU ຕ່າງປະເທດ','MOU','MOU協議'),               'url'=>$R('mou.index')],
+        ['icon'=>'fas fa-hand-holding-heart','label'=>$t('ໂຄງການ ຊ່ວຍເຫຼືອ','Aid Projects','援助項目'),  'url'=>$R('aid-projects.index')],
+      ]],
+      ['label' => $t('ສື່ສາ','Media','媒體'), 'url' => null, 'items' => [
+        ['icon'=>'fab fa-youtube',           'label'=>'DhammaOnLen','url'=>'https://www.youtube.com/@DhammaOnLen','external'=>true],
+        ['icon'=>'fas fa-images',            'label'=>$t('ຮູບພາບ ກິດຈະກຳ','Gallery','活動相冊'), 'url'=>$R('media.index')],
+        ['icon'=>'fas fa-file-lines',        'label'=>$t('ເອກະສານ','Documents','文件'),           'url'=>$R('documents.index')],
+      ]],
+      ['label' => $t('ຂ່າວສານ','News','新聞'),      'url' => $R('news.index'), 'items' => []],
+      ['label' => $t('ຕິດຕໍ່','Contact','聯繫我們'), 'url' => $R('contact'),    'items' => []],
+    ];
+  }
 @endphp
 
 <header
@@ -103,6 +137,7 @@
             </div>
           @elseif($item['url'])
             <a href="{{ $item['url'] }}"
+               @if(!empty($item['external'])) target="_blank" rel="noreferrer" @endif
                class="px-3 py-2 text-[13px] font-semibold rounded-lg transition-all duration-200 cursor-pointer
                       {{ request()->url() === $item['url'] ? 'text-secondary' : 'text-on-primary/80 hover:text-secondary hover:bg-white/10' }}">
               {{ $item['label'] }}
@@ -166,7 +201,9 @@
               </div>
             </div>
           @elseif($item['url'])
-            <a href="{{ $item['url'] }}" @click="open = false"
+            <a href="{{ $item['url'] }}"
+               @if(!empty($item['external'])) target="_blank" rel="noreferrer" @endif
+               @click="open = false"
                class="block px-4 py-3 text-sm font-medium rounded-xl transition-all cursor-pointer
                       {{ request()->url() === $item['url'] ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
               {{ $item['label'] }}

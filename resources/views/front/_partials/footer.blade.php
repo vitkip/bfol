@@ -4,16 +4,19 @@
   $R = fn($name,...$p) => route('front.'.$name,...$p);
 
   $aboutLinks = [
-    ['lo'=>'ປະຫວັດຄວາມເປັນມາ','en'=>'History',   'zh'=>'歷史',   'url'=>'#'],
-    ['lo'=>'ວິສາຫະກິດ & ຄາລະກິດ','en'=>'Mission', 'zh'=>'使命',   'url'=>'#'],
-    ['lo'=>'ໂຄງສ້າງອົງການ','en'=>'Structure',      'zh'=>'組織結構','url'=>'#'],
-    ['lo'=>'ຄະນະກຳມະການ','en'=>'Committee',        'zh'=>'委員會', 'url'=>'#'],
+    ['lo'=>'ປະຫວັດຄວາມເປັນມາ','en'=>'History',        'zh'=>'歷史',    'url'=>$R('page.show','history')],
+    ['lo'=>'ວິໄສທັດ & ພັນທະກິດ','en'=>'Mission & Vision','zh'=>'使命願景','url'=>$R('page.show','mission')],
+    ['lo'=>'ໂຄງສ້າງອົງການ','en'=>'Structure',           'zh'=>'組織結構', 'url'=>$R('structure')],
+    ['lo'=>'ຄະນະກຳມະການ','en'=>'Committee',             'zh'=>'委員會',  'url'=>$R('committee')],
   ];
   $activityLinks = [
-    ['lo'=>'ຂ່າວສານ','en'=>'News',          'zh'=>'新聞',   'url'=>$R('news.index')],
-    ['lo'=>'MOU ຕ່າງປະເທດ','en'=> "Int'l MOU",'zh'=>'MOU協議','url'=>'#'],
-    ['lo'=>'ໂຄງການ ຊ່ວຍເຫຼືອ','en'=>'Aid Projects','zh'=>'援助項目','url'=>'#'],
-    ['lo'=>'ແລກປ່ຽນ ສາກົນ','en'=>"Int'l Exchange",'zh'=>'國際交流','url'=>'#'],
+    ['lo'=>'ຂ່າວສານ','en'=>'News',               'zh'=>'新聞',   'url'=>$R('news.index')],
+    ['lo'=>'ຄູ່ຮ່ວມມືສາກົນ','en'=>'Partners',    'zh'=>'合作夥伴','url'=>$R('partners.index')],
+    ['lo'=>'MOU ຕ່າງປະເທດ','en'=>"Int'l MOU",    'zh'=>'MOU協議','url'=>$R('mou.index')],
+    ['lo'=>'ໂຄງການຊ່ວຍເຫຼືອ','en'=>'Aid Projects','zh'=>'援助項目','url'=>$R('aid-projects.index')],
+    ['lo'=>'ແລກປ່ຽນສາກົນ','en'=>"Int'l Exchange", 'zh'=>'國際交流','url'=>$R('monk-programs.index')],
+    ['lo'=>'ເອກະສານ','en'=>'Documents',           'zh'=>'文件',   'url'=>$R('documents.index')],
+    ['lo'=>'ຮູບພາບກິດຈະກຳ','en'=>'Gallery',       'zh'=>'活動相冊','url'=>$R('media.index')],
   ];
 @endphp
 
@@ -45,7 +48,7 @@
 
         <p class="text-sm text-on-primary-container/80 leading-relaxed mb-6">
           {{ $t(
-            'ອົງການສາສະໜາ ທີ່ ຮ່ວມກັນ ສົ່ງເສີມ ແລະ ພັດທະນາ ດ້ານ ສາສະໜາ ທາງ ລາວ ໃນ ລະດັບ ຊາດ ແລະ ສາກົນ.',
+            'ອົງການສາສະໜາທີ່ຮ່ວມກັນສົ່ງເສີມ ແລະ ພັດທະນາດ້ານສາສະໜາລາວ ໃນລະດັບຊາດ ແລະ ສາກົນ.',
             'A Buddhist organization promoting and developing Lao Buddhism at national and international levels.',
             '致力於在國家和國際層面推廣和發展老撾佛教的宗教組織。'
           ) }}

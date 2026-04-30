@@ -47,9 +47,19 @@ class AppServiceProvider extends ServiceProvider
                     ->groupBy('position');
             }
 
+            static $navMenus = null;
+            if ($navMenus === null) {
+                $navMenus = \App\Models\NavigationMenu::active()
+                    ->with(['children' => fn($q) => $q->active()->orderBy('sort_order')])
+                    ->whereNull('parent_id')
+                    ->orderBy('sort_order')
+                    ->get();
+            }
+
             $view->with('settings', $settings)
                  ->with('locale', app()->getLocale())
-                 ->with('bannersByPos', $bannersByPos);
+                 ->with('bannersByPos', $bannersByPos)
+                 ->with('navMenus', $navMenus);
         });
     }
 }

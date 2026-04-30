@@ -75,26 +75,20 @@
         </p>
         <div class="flex flex-wrap gap-1.5 mb-2">
           @foreach([
-            ['/', 'ໜ້າຫຼັກ'],
-            ['/news', 'ຂ່າວສານ'],
-            ['/contact', 'ຕິດຕໍ່'],
-            ['/about/history', 'ປະຫວັດ'],
-            ['/about/mission', 'ວິໄສທັດ'],
-            ['/about/structure', 'ໂຄງສ້າງ'],
-            ['/about/committee', 'ຄະນະກຳ'],
-            ['/dhamma/sila', 'ສີລ ສະມາທິ'],
-            ['/dhamma/teach', 'ດ້ານສອນ'],
-            ['/dhamma/research', 'ວິໄຊ'],
-            ['/foreign/diplomacy', 'ການທູດ'],
-            ['/foreign/exchange', 'ແລກປ່ຽນ'],
-            ['/foreign/mou', 'MOU'],
-            ['/foreign/aid', 'ຊ່ວຍເຫຼືອ'],
-            ['/foreign/education', 'ສຶກສາສາກົນ'],
-            ['/media/dhamma-on-len', 'DhammaOnLen'],
-            ['/media/online', 'ສອນ Online'],
-            ['/media/gallery', 'ຮູບພາບ'],
-            ['/media/video', 'ວິດີໂອ'],
-            ['/media/documents', 'ເອກະສານ'],
+            [route('front.home'),             'ໜ້າຫຼັກ'],
+            [route('front.news.index'),       'ຂ່າວສານ'],
+            [route('front.events.index'),     'ກິດຈະກຳ'],
+            [route('front.contact'),          'ຕິດຕໍ່'],
+            [route('front.structure'),        'ໂຄງສ້າງ'],
+            [route('front.committee'),        'ຄະນະກຳ'],
+            [route('front.partners.index'),   'ຄູ່ຮ່ວມ'],
+            [route('front.monk-programs.index'), 'ແລກປ່ຽນ'],
+            [route('front.mou.index'),        'MOU'],
+            [route('front.aid-projects.index'),'ຊ່ວຍເຫຼືອ'],
+            [route('front.media.index'),      'ຮູບພາບ'],
+            [route('front.documents.index'),  'ເອກະສານ'],
+            [route('front.search'),           'ຄົ້ນຫາ'],
+            ['https://www.youtube.com/@DhammaOnLen', 'DhammaOnLen'],
           ] as [$url, $label])
             <button type="button" onclick="setUrl('{{ $url }}')"
                     class="px-2 py-1 text-xs bg-white border border-blue-200 rounded hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors text-blue-700">
@@ -111,7 +105,7 @@
                   class="flex-1 rounded border border-blue-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
             <option value="">— ເລືອກໜ້າ CMS —</option>
             @foreach($pages as $page)
-              <option value="/lo/page/{{ $page->slug }}">
+              <option value="{{ route('front.page.show', $page->slug) }}">
                 {{ $page->title_lo ?: $page->title_en }} ({{ $page->slug }})
               </option>
             @endforeach

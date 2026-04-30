@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class NavigationMenu extends Model
 {
     protected $fillable = [
-        'label_lo', 'label_en', 'url', 'target', 'icon',
+        'label_lo', 'label_en', 'label_zh', 'url', 'target', 'icon',
         'parent_id', 'sort_order', 'is_active',
     ];
 

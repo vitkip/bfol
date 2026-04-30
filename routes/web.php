@@ -30,6 +30,10 @@ use App\Http\Controllers\Front\CommitteeController;
 use App\Http\Controllers\Front\DocumentController;
 use App\Http\Controllers\Front\StructureController;
 use App\Http\Controllers\Front\SearchController;
+use App\Http\Controllers\Front\PartnerController as FrontPartner;
+use App\Http\Controllers\Front\MouController as FrontMou;
+use App\Http\Controllers\Front\AidProjectController as FrontAidProject;
+use App\Http\Controllers\Front\MonkProgramController as FrontMonkProgram;
 use Illuminate\Support\Facades\Route;
 
 // ─── ADMIN AUTH (no locale prefix) ───────────────────────────────────────────
@@ -105,4 +109,9 @@ Route::name('front.')->group(function () {
     Route::get('documents/{document}/preview',  [DocumentController::class, 'preview'])->name('documents.preview');
     Route::get('documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
     Route::get('search',                    [SearchController::class,    'index'])->name('search');
+    Route::get('partners',                  [FrontPartner::class,        'index'])->name('partners.index');
+    Route::get('partners/{partner}',        [FrontPartner::class,        'show'])->name('partners.show');
+    Route::get('mou',                       [FrontMou::class,            'index'])->name('mou.index');
+    Route::get('aid-projects',              [FrontAidProject::class,     'index'])->name('aid-projects.index');
+    Route::get('monk-programs',             [FrontMonkProgram::class,    'index'])->name('monk-programs.index');
 });
