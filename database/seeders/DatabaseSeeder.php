@@ -15,6 +15,11 @@ class DatabaseSeeder extends Seeder
             SiteStatisticsSeeder::class,
             HeroSlidesSeeder::class,
             SiteSettingsSeeder::class,
+            PartnersSeeder::class,
+            PagesSeeder::class,
+            MouSeeder::class,
+            AidProjectsSeeder::class,
+            MonkProgramsSeeder::class,
         ]);
     }
 }

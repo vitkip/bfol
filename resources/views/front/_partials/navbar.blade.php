@@ -68,7 +68,7 @@
 @endphp
 
 <header
-  x-data="{ open: false, drop: null, scrolled: false }"
+  x-data="{ open: false, drop: null, scrolled: false, search: false }"
   x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 20, { passive: true })"
   :class="scrolled ? 'bg-primary/95 backdrop-blur-md shadow-sm border-b border-primary-container' : 'bg-primary'"
   class="sticky top-0 z-[100] w-full transition-all duration-500"
@@ -145,21 +145,65 @@
           @endif
         @endforeach
 
+        {{-- Search icon (desktop) --}}
+        <div class="relative ml-1" x-data>
+          <button @click="search = !search; $nextTick(() => search && $refs.searchInput.focus())"
+                  class="p-2.5 rounded-lg text-on-primary/70 hover:text-secondary hover:bg-white/10
+                         transition-all duration-200 cursor-pointer"
+                  :class="search ? 'bg-white/10 text-secondary' : ''"
+                  :aria-label="'{{ $t('ຄົ້ນຫາ','Search','搜索') }}'">
+            <i x-show="!search" class="fas fa-search text-[14px]"></i>
+            <i x-show="search"  class="fas fa-times text-[14px]" style="display:none"></i>
+          </button>
+
+          {{-- Search popover --}}
+          <div x-show="search"
+               x-transition:enter="transition ease-out duration-150"
+               x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+               x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+               x-transition:leave="transition ease-in duration-100"
+               x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+               @click.outside="search = false"
+               @keydown.escape.window="search = false"
+               class="absolute top-full right-0 mt-2 w-72 z-50"
+               style="display:none">
+            <form action="{{ $R('search') }}" method="GET"
+                  class="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden flex">
+              <input x-ref="searchInput"
+                     type="text" name="q"
+                     placeholder="{{ $t('ຄົ້ນຫາ...','Search...','搜索...') }}"
+                     class="flex-1 px-4 py-2.5 text-sm text-on-surface
+                            focus:outline-none placeholder:text-slate-400" />
+              <button type="submit"
+                      class="px-4 py-2.5 bg-primary text-on-primary text-sm
+                             hover:bg-secondary hover:text-on-secondary transition-colors cursor-pointer">
+                <i class="fas fa-search text-xs"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
         {{-- CTA --}}
         <a href="{{ $R('contact') }}"
-           class="ml-3 px-5 py-2.5 bg-secondary text-on-secondary text-[13px] font-bold rounded-md cursor-pointer
+           class="ml-2 px-5 py-2.5 bg-secondary text-on-secondary text-[13px] font-bold rounded-md cursor-pointer
                   shadow-sm hover:bg-secondary-container hover:text-on-secondary-container hover:shadow-md
                   hover:-translate-y-0.5 transition-all duration-200">
           {{ $t('ຕິດຕໍ່ພວກເຮົາ','Contact Us','聯繫我們') }}
         </a>
       </nav>
 
-      {{-- Mobile hamburger --}}
-      <button @click="open = !open"
-              class="lg:hidden p-2.5 rounded-md transition-colors cursor-pointer text-on-primary hover:bg-white/10">
-        <i x-show="!open"  class="fas fa-bars text-lg"></i>
-        <i x-show="open"   class="fas fa-times text-lg" style="display:none"></i>
-      </button>
+      {{-- Mobile: search + hamburger --}}
+      <div class="lg:hidden flex items-center gap-1">
+        <a href="{{ $R('search') }}"
+           class="p-2.5 rounded-md transition-colors cursor-pointer text-on-primary/80 hover:bg-white/10">
+          <i class="fas fa-search text-base"></i>
+        </a>
+        <button @click="open = !open"
+                class="p-2.5 rounded-md transition-colors cursor-pointer text-on-primary hover:bg-white/10">
+          <i x-show="!open"  class="fas fa-bars text-lg"></i>
+          <i x-show="open"   class="fas fa-times text-lg" style="display:none"></i>
+        </button>
+      </div>
     </div>
 
     {{-- Mobile menu --}}
@@ -173,6 +217,22 @@
          style="display:none">
       <div class="bg-white rounded-2xl p-2 flex flex-col gap-0.5 max-h-[75vh] overflow-y-auto
                   border border-slate-100 shadow-xl mt-2">
+
+        {{-- Mobile search bar --}}
+        <div class="px-2 pb-2 pt-1">
+          <form action="{{ $R('search') }}" method="GET"
+                class="flex items-center gap-2 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden px-3">
+            <i class="fas fa-search text-slate-400 text-xs shrink-0"></i>
+            <input type="text" name="q"
+                   placeholder="{{ $t('ຄົ້ນຫາ...','Search...','搜索...') }}"
+                   class="flex-1 py-2.5 text-sm bg-transparent text-on-surface
+                          focus:outline-none placeholder:text-slate-400" />
+            <button type="submit" class="text-primary hover:text-secondary transition-colors cursor-pointer">
+              <i class="fas fa-arrow-right text-xs"></i>
+            </button>
+          </form>
+        </div>
+
         @foreach($menu as $item)
           @if(!empty($item['items']))
             <div class="rounded-xl overflow-hidden"

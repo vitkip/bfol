@@ -5,28 +5,36 @@
   $areas = [
     ['num'=>'01','icon'=>'fas fa-book-open',
      'title'=>$t('ການສຶກສາ ສາສະໜາ','Religious Education','宗教教育'),
-     'desc' =>$t('ຮຽນ ສີລ ສະມາທິ ທັມ ທັງໃນ ແລະ ຕ່າງປະເທດ','Study Sila, Samadhi & Dhamma','學習戒定慧')],
+     'desc' =>$t('ຮຽນ ສີລ ສະມາທິ ທັມ ທັງໃນ ແລະ ຕ່າງປະເທດ','Study Sila, Samadhi & Dhamma','學習戒定慧'),
+     'url'  => route('front.page.show','sila-dhamma')],
     ['num'=>'02','icon'=>'fas fa-chalkboard-teacher',
      'title'=>$t('ດ້ານການສອນ','Teaching','教學工作'),
-     'desc' =>$t('ຝຶກອົບຮົມ ແລະ ພັດທະນາຄູສອນ','Teacher training & development','培訓教師')],
+     'desc' =>$t('ຝຶກອົບຮົມ ແລະ ພັດທະນາຄູສອນ','Teacher training & development','培訓教師'),
+     'url'  => route('front.page.show','teaching')],
     ['num'=>'03','icon'=>'fas fa-microscope',
      'title'=>$t('ການຄົ້ນຄ້ວາ ວິໄຈ','Research','學術研究'),
-     'desc' =>$t('ທັດທາ ແລະ ວິໄຊ ດ້ານ ສາສະໜາ ລາວ','Buddhist research in Laos','佛教學術研究')],
+     'desc' =>$t('ທັດທາ ແລະ ວິໄຊ ດ້ານ ສາສະໜາ ລາວ','Buddhist research in Laos','佛教學術研究'),
+     'url'  => route('front.page.show','research')],
     ['num'=>'04','icon'=>'fas fa-hands-helping',
      'title'=>$t('ສາສາ ແລະ ສັງຄົມ','Society & Religion','宗教與社會'),
-     'desc' =>$t('ກິດຈະກຳ ສຶກສາ ສາດ ໃນ ຊຸມຊົນ','Community religious activities','社區宗教活動')],
+     'desc' =>$t('ກິດຈະກຳ ສຶກສາ ສາດ ໃນ ຊຸມຊົນ','Community religious activities','社區宗教活動'),
+     'url'  => route('front.page.show','society')],
     ['num'=>'05','icon'=>'fas fa-globe-asia',
-     'title'=>$t('ການທູດສາສາສາ','Religious Diplomacy','宗教外交'),
-     'desc' =>$t('ຄວາມສໍາພັນ ກັບ ອົງການ ສາກົນ','International Buddhist relations','國際佛教關係')],
+     'title'=>$t('ການທູດສາສາ','Religious Diplomacy','宗教外交'),
+     'desc' =>$t('ຄວາມສໍາພັນ ກັບ ອົງການ ສາກົນ','International Buddhist relations','國際佛教關係'),
+     'url'  => route('front.partners.index')],
     ['num'=>'06','icon'=>'fas fa-exchange-alt',
      'title'=>$t('ແລກປ່ຽນ ສາກົນ',"Int'l Exchange",'國際交流'),
-     'desc' =>$t('ໂຄງການ ແລກປ່ຽນ ພ້ອຍ ແລະ ສາມະເນນ','Monk exchange programs','僧侶交流項目')],
+     'desc' =>$t('ໂຄງການ ແລກປ່ຽນ ພ້ອຍ ແລະ ສາມະເນນ','Monk exchange programs','僧侶交流項目'),
+     'url'  => route('front.monk-programs.index')],
     ['num'=>'07','icon'=>'fas fa-file-signature',
      'title'=>$t('MOU ຕ່າງປະເທດ',"Int'l MOU",'國際協議'),
-     'desc' =>$t('ບົດບັນທຶກ ຄວາມເຂົ້າໃຈ ກັບ ປະເທດ ຕ່າງໆ','MOU with foreign countries','與外國簽署協議')],
+     'desc' =>$t('ບົດບັນທຶກ ຄວາມເຂົ້າໃຈ ກັບ ປະເທດ ຕ່າງໆ','MOU with foreign countries','與外國簽署協議'),
+     'url'  => route('front.mou.index')],
     ['num'=>'08','icon'=>'fas fa-hand-holding-heart',
      'title'=>$t('ໂຄງການ ຊ່ວຍເຫຼືອ','Aid Projects','援助項目'),
-     'desc' =>$t('ໂຄງການ ສາດ ຊ່ວຍ ສັງຄົມ ແລະ ຊຸດຊົນ','Community aid programs','社會援助計劃')],
+     'desc' =>$t('ໂຄງການ ສາດ ຊ່ວຍ ສັງຄົມ ແລະ ຊຸດຊົນ','Community aid programs','社會援助計劃'),
+     'url'  => route('front.aid-projects.index')],
   ];
 @endphp
 
@@ -55,22 +63,23 @@
     {{-- Card grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       @foreach($areas as $a)
-        <div class="group relative flex flex-col items-center text-center cursor-default
-                     p-5 md:p-6 rounded-lg bg-surface border border-outline-variant/30 overflow-hidden
-                     shadow-sm hover:shadow-lg hover:-translate-y-1.5 hover:border-secondary/30
-                     transition-all duration-300">
+        <a href="{{ $a['url'] }}"
+           class="group relative flex flex-col items-center text-center
+                  p-5 md:p-6 rounded-lg bg-surface border border-outline-variant/30 overflow-hidden
+                  shadow-sm hover:shadow-lg hover:-translate-y-1.5 hover:border-secondary/40
+                  hover:bg-primary/[.02] transition-all duration-300 cursor-pointer">
 
           {{-- Bottom accent line --}}
           <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary to-secondary-container
                        scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 
           <span class="absolute top-3 right-3 text-[10px] font-bold font-sans
-                        text-outline/30 group-hover:text-outline transition-colors select-none">
+                        text-outline/30 group-hover:text-outline/60 transition-colors select-none">
             {{ $a['num'] }}
           </span>
 
           <div class="w-14 h-14 rounded-md bg-primary/5 flex items-center justify-center mb-4
-                       group-hover:scale-110 transition-all duration-300">
+                       group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
             <i class="{{ $a['icon'] }} text-primary text-xl"></i>
           </div>
 
@@ -79,7 +88,7 @@
             {{ $a['title'] }}
           </h3>
 
-          <p class="text-xs text-on-surface-variant leading-relaxed">
+          <p class="text-xs text-on-surface-variant leading-relaxed flex-1">
             {{ $a['desc'] }}
           </p>
 
@@ -89,7 +98,7 @@
             {{ $t('ເບິ່ງເພີ່ມ','Learn more','了解更多') }}
             <i class="fas fa-arrow-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
           </div>
-        </div>
+        </a>
       @endforeach
     </div>
 
