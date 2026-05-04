@@ -34,6 +34,8 @@ use App\Http\Controllers\Front\PartnerController as FrontPartner;
 use App\Http\Controllers\Front\MouController as FrontMou;
 use App\Http\Controllers\Front\AidProjectController as FrontAidProject;
 use App\Http\Controllers\Front\MonkProgramController as FrontMonkProgram;
+use App\Http\Controllers\Front\PhotoAlbumController as FrontAlbum;
+use App\Http\Controllers\Front\TranslationProjectController as FrontTranslation;
 use App\Http\Controllers\Admin\PhotoAlbumController as AdminAlbum;
 use App\Http\Controllers\Admin\TranslationController as AdminTranslation;
 use Illuminate\Support\Facades\Route;
@@ -119,4 +121,7 @@ Route::name('front.')->group(function () {
     Route::get('mou',                       [FrontMou::class,            'index'])->name('mou.index');
     Route::get('aid-projects',              [FrontAidProject::class,     'index'])->name('aid-projects.index');
     Route::get('monk-programs',             [FrontMonkProgram::class,    'index'])->name('monk-programs.index');
+    Route::get('gallery',                   [FrontAlbum::class,          'index'])->name('gallery.index');
+    Route::get('gallery/{album}',           [FrontAlbum::class,          'show'])->name('gallery.show');
+    Route::get('translations',              [FrontTranslation::class,    'index'])->name('translations.index');
 });
