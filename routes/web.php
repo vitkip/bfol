@@ -34,6 +34,8 @@ use App\Http\Controllers\Front\PartnerController as FrontPartner;
 use App\Http\Controllers\Front\MouController as FrontMou;
 use App\Http\Controllers\Front\AidProjectController as FrontAidProject;
 use App\Http\Controllers\Front\MonkProgramController as FrontMonkProgram;
+use App\Http\Controllers\Admin\PhotoAlbumController as AdminAlbum;
+use App\Http\Controllers\Admin\TranslationController as AdminTranslation;
 use Illuminate\Support\Facades\Route;
 
 // ─── ADMIN AUTH (no locale prefix) ───────────────────────────────────────────
@@ -64,6 +66,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('aid-projects',  AdminAidProject::class);
     Route::resource('tags',          \App\Http\Controllers\Admin\TagController::class);
     Route::resource('categories',    \App\Http\Controllers\Admin\CategoryController::class);
+    Route::resource('albums',        AdminAlbum::class);
+    Route::delete('albums/{album}/images/{image}', [AdminAlbum::class, 'destroyImage'])->name('albums.images.destroy');
+    Route::resource('translations',  AdminTranslation::class);
     Route::resource('contacts',      AdminContact::class)->only(['index','show','destroy']);
     Route::patch('contacts/{contact}/read', [AdminContact::class, 'markRead'])->name('contacts.read');
 

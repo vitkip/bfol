@@ -117,10 +117,12 @@
             ['admin.news.*',      route('admin.news.index'),      'fa-newspaper',   'ຂ່າວສານ'],
             ['admin.events.*',    route('admin.events.index'),    'fa-calendar',    'ກິດຈະກໍາ'],
             ['admin.pages.*',     route('admin.pages.index'),     'fa-file-alt',    'ໜ້າຂໍ້ມູນ'],
-            ['admin.media.*',     route('admin.media.index'),     'fa-photo-video', 'ສື່ທໍາ'],
-            ['admin.documents.*', route('admin.documents.index'), 'fa-file-pdf',    'ເອກະສານ'],
-            ['admin.categories.*',route('admin.categories.index'),'fa-layer-group', 'Categories'],
-            ['admin.tags.*',      route('admin.tags.index'),      'fa-tags',        'Tags'],
+            ['admin.media.*',        route('admin.media.index'),        'fa-photo-video', 'ສື່ທໍາ'],
+            ['admin.albums.*',       route('admin.albums.index'),       'fa-images',     'ອາລ໌ບໍ້ຮູບ'],
+            ['admin.documents.*',    route('admin.documents.index'),    'fa-file-pdf',   'ເອກະສານ'],
+            ['admin.translations.*', route('admin.translations.index'), 'fa-language',   'ໂຄງການແປ'],
+            ['admin.categories.*',   route('admin.categories.index'),   'fa-layer-group','Categories'],
+            ['admin.tags.*',         route('admin.tags.index'),         'fa-tags',       'Tags'],
           ] as [$route, $url, $icon, $label])
         <a href="{{ $url }}"
            class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs($route) ? 'nav-active' : 'text-on-surface-variant' }}">
