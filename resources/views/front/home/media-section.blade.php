@@ -68,16 +68,20 @@
       </a>
 
       {{-- Gallery --}}
-      <div class="min-h-[160px] md:min-h-0 group relative rounded-lg overflow-hidden
-                  bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
+      <a href="{{ route('front.gallery.index') }}"
+         class="min-h-[160px] md:min-h-0 group relative rounded-lg overflow-hidden
+                bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
         <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
           <i class="fas fa-images text-on-primary/30 text-5xl
                     group-hover:scale-110 transition-transform duration-300 group-hover:text-secondary"></i>
           <p class="text-on-primary font-bold text-base group-hover:text-secondary transition-colors duration-200">
-            {{ $t('ຮູບພາບ ກິດຈະກຳ','Photo Gallery','活動相冊') }}
+            {{ $t('ຄັງຮູບ ກິດຈະກຳ','Photo Gallery','活動相冊') }}
           </p>
+          <span class="text-on-primary/40 text-xs group-hover:text-secondary/60 transition-colors">
+            <i class="fas fa-arrow-right text-[10px]"></i>
+          </span>
         </div>
-      </div>
+      </a>
 
       {{-- Documents --}}
       <a href="{{ route('front.documents.index') }}"
@@ -95,12 +99,13 @@
     </div>
 
     {{-- Channel quick links --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-4">
       @foreach([
-        ['icon'=>'fab fa-youtube',    'label'=>'YouTube',  'sub'=>$ytHandle, 'color'=>'text-red-400',  'href'=>$ytUrl],
-        ['icon'=>'fab fa-facebook-f', 'label'=>'Facebook', 'sub'=>$fbHandle, 'color'=>'text-blue-400', 'href'=>$fbUrl],
-        ['icon'=>'fas fa-images',     'label'=>$t('ຮູບພາບ','Gallery','相冊'), 'sub'=>$t('ກິດຈະກຳ','Activities','活動'), 'color'=>'text-secondary','href'=>'#'],
-        ['icon'=>'fas fa-file-lines', 'label'=>$t('ເອກະສານ','Documents','文件'),'sub'=>$t('PDF & ໄຟລ໌','PDF & Files','PDF文件'),'color'=>'text-secondary','href'=>route('front.documents.index')],
+        ['icon'=>'fab fa-youtube',    'label'=>'YouTube',                                      'sub'=>$ytHandle,                                             'color'=>'text-red-400',    'href'=>$ytUrl,                              'ext'=>true],
+        ['icon'=>'fab fa-facebook-f', 'label'=>'Facebook',                                     'sub'=>$fbHandle,                                             'color'=>'text-blue-400',   'href'=>$fbUrl,                              'ext'=>true],
+        ['icon'=>'fas fa-images',     'label'=>$t('ຄັງຮູບ','Gallery','相冊'),                  'sub'=>$t('ກິດຈະກຳ','Photo Albums','活動相冊'),               'color'=>'text-secondary',  'href'=>route('front.gallery.index'),        'ext'=>false],
+        ['icon'=>'fas fa-language',   'label'=>$t('ໂຄງການແປ','Translations','翻譯'),           'sub'=>$t('ຄຳສອນ ຫຼາຍພາສາ','Multi-language','多語翻譯'),        'color'=>'text-emerald-400','href'=>route('front.translations.index'),   'ext'=>false],
+        ['icon'=>'fas fa-file-lines', 'label'=>$t('ເອກະສານ','Documents','文件'),               'sub'=>$t('PDF & ໄຟລ໌','PDF & Files','PDF文件'),               'color'=>'text-secondary',  'href'=>route('front.documents.index'),      'ext'=>false],
       ] as $m)
         <a href="{{ $m['href'] }}"
            @if(str_starts_with($m['href'],'http')) target="_blank" rel="noreferrer" @endif
