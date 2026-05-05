@@ -16,7 +16,7 @@
      'desc' =>$t('ທັດທາ ແລະ ວິໄຊ ດ້ານ ສາສະໜາ ລາວ','Buddhist research in Laos','佛教學術研究'),
      'url'  => route('front.page.show','research')],
     ['num'=>'04','icon'=>'fas fa-hands-helping',
-     'title'=>$t('ສາສາ ແລະ ສັງຄົມ','Society & Religion','宗教與社會'),
+     'title'=>$t('ສາສະໜາ ແລະ ສັງຄົມ','Society & Religion','宗教與社會'),
      'desc' =>$t('ກິດຈະກຳ ສຶກສາ ສາດ ໃນ ຊຸມຊົນ','Community religious activities','社區宗教活動'),
      'url'  => route('front.page.show','society')],
     ['num'=>'05','icon'=>'fas fa-globe-asia',
