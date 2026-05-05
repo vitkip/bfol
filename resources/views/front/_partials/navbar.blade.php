@@ -117,8 +117,14 @@
                    :class="drop === '{{ $item['label'] }}' ? 'rotate-180' : ''"></i>
               </button>
               {{-- Dropdown panel --}}
-              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 transition-all duration-200"
-                   :class="drop === '{{ $item['label'] }}' ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-1'">
+              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50"
+                   x-show="drop === '{{ $item['label'] }}'"
+                   x-transition:enter="transition ease-out duration-200"
+                   x-transition:enter-start="opacity-0 -translate-y-1"
+                   x-transition:enter-end="opacity-100 translate-y-0"
+                   x-transition:leave="transition ease-in duration-150"
+                   x-transition:leave-end="opacity-0 -translate-y-1"
+                   style="display:none">
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 min-w-[220px]">
                   @foreach($item['items'] as $sub)
                     <a href="{{ $sub['url'] }}"

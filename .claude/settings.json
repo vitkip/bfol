@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Applications/XAMPP/xamppfiles/htdocs/bfol/scripts/ftp-upload.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

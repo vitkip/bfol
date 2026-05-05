@@ -1,5 +1,6 @@
 *.log
 .DS_Store
+/scripts/
 Thumbs.db
 .env
 .env.backup

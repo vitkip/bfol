@@ -5,7 +5,11 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-$appRoot = dirname(__DIR__);
+// Standard structure: vendor/ sits next to public/ (local dev, VPS)
+// Shared hosting: public/ is inside public_html/, app lives in ../bfol/
+$appRoot = is_dir(dirname(__DIR__) . '/vendor')
+    ? dirname(__DIR__)
+    : realpath(__DIR__ . '/../bfol');
 
 if (file_exists($maintenance = $appRoot . '/storage/framework/maintenance.php')) {
     require $maintenance;
