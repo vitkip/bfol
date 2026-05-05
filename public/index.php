@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-$appRoot = '/home/csfangko/public_html/csfa';
+$appRoot = dirname(__DIR__);
 
 if (file_exists($maintenance = $appRoot . '/storage/framework/maintenance.php')) {
     require $maintenance;

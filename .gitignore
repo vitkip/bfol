@@ -1,10 +1,13 @@
 *.log
 .DS_Store
+Thumbs.db
 .env
 .env.backup
 .env.production
+.env.*.local
 .phpactor.json
 .phpunit.result.cache
+/.agent
 /.cursor/
 /.idea
 /.nova
@@ -16,10 +19,11 @@
 /public/build
 /public/hot
 /public/storage
+/public/clear_cache.php
+/public/storage_link.php
 /storage/*.key
 /storage/pail
 /vendor
 _ide_helper.php
 Homestead.json
 Homestead.yaml
-Thumbs.db
