@@ -3,16 +3,6 @@
   $t = fn($lo,$en,$zh) => match($L){'zh'=>$zh,'en'=>$en,default=>$lo};
   $R = fn($name,...$p) => route('front.'.$name,...$p);
 
-  // ─── Build menu from DB (navigation_menus table) if admin has set items ────
-  // $navMenus is shared by AppServiceProvider to all front.* views.
-  // If the table has entries, use them. Otherwise fall back to the hardcoded default.
-
-  $buildMenuFromDb = function() use ($L, $t) {
-    $dbMenus = $GLOBALS['navMenus'] ?? null;
-    // $navMenus is a Blade variable — access via the view's data
-    return null; // signal: use the Blade variable path below
-  };
-
   $labelFn = fn($m) => match($L) {
     'zh'    => $m->label_zh ?: $m->label_lo,
     'en'    => $m->label_en ?: $m->label_lo,
@@ -22,7 +12,6 @@
   $isExternal = fn($m) => $m->target === '_blank' || str_starts_with((string)$m->url, 'http');
 
   if (isset($navMenus) && $navMenus->isNotEmpty()) {
-    // ─── DB-driven menu ────────────────────────────────────────────────────
     $menu = $navMenus->map(fn($m) => [
       'label'    => $labelFn($m),
       'url'      => $m->url ?: null,
@@ -35,7 +24,6 @@
       ])->all(),
     ])->all();
   } else {
-    // ─── Hardcoded default (shown until admin adds items via ຈັດການເມນູ) ───
     $menu = [
       ['label' => $t('ໜ້າຫຼັກ','Home','首頁'),        'url' => $R('home'),       'items' => []],
       ['label' => $t('ກ່ຽວກັບ ອພສ','About BFOL','關於我們'), 'url' => null, 'items' => [
@@ -69,11 +57,9 @@
   }
 @endphp
 
-<header
-  x-data="{ open: false, drop: null, scrolled: false, search: false }"
-  x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 20, { passive: true })"
-  :class="scrolled ? 'bg-primary/95 backdrop-blur-md shadow-sm border-b border-primary-container' : 'bg-primary'"
+<header id="site-header"
   class="sticky top-0 z-[100] w-full transition-all duration-500"
+  style="background-color:#031632"
 >
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between py-4">
@@ -92,10 +78,10 @@
           </div>
         @endif
         <div class="leading-tight min-w-0 max-w-[200px]">
-          <div class="font-serif font-bold text-[15px] truncate text-on-primary group-hover:text-secondary transition-colors">
+          <div class="font-serif font-bold text-[15px] truncate text-white group-hover:text-secondary transition-colors">
             {{ $t($settings->site_name_lo, $settings->site_name_en, $settings->site_name_zh) ?: 'ອພສ · BFOL' }}
           </div>
-          <div class="text-[11px] truncate text-on-primary/60">
+          <div class="text-[11px] truncate text-white/60">
             {{ $settings->site_name_en ?: 'BFOL' }}
           </div>
         </div>
@@ -103,39 +89,29 @@
 
       {{-- Desktop nav --}}
       <nav class="hidden lg:flex items-center gap-0.5 xl:gap-1">
-        @foreach($menu as $item)
+        @foreach($menu as $idx => $item)
           @if(!empty($item['items']))
             {{-- Dropdown --}}
-            <div class="relative group"
-                 @mouseenter="drop = '{{ $item['label'] }}'"
-                 @mouseleave="drop = null">
-              <button class="flex items-center gap-1.5 px-3 py-2 text-[13px] font-semibold rounded-lg
-                             transition-all duration-200 cursor-pointer
-                             text-on-primary/80 hover:text-secondary hover:bg-white/10">
+            <div class="relative nav-dropdown">
+              <button type="button"
+                      class="nav-dd-btn flex items-center gap-1.5 px-3 py-2 text-[13px] font-semibold rounded-lg
+                             transition-all duration-200 cursor-pointer text-white/80 hover:text-secondary hover:bg-white/10">
                 {{ $item['label'] }}
-                <i class="fas fa-chevron-down text-[9px] opacity-60 transition-transform duration-200"
-                   :class="drop === '{{ $item['label'] }}' ? 'rotate-180' : ''"></i>
+                <i class="nav-dd-icon fas fa-chevron-down text-[9px] opacity-60 transition-transform duration-200"></i>
               </button>
               {{-- Dropdown panel --}}
-              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50"
-                   x-show="drop === '{{ $item['label'] }}'"
-                   x-transition:enter="transition ease-out duration-200"
-                   x-transition:enter-start="opacity-0 -translate-y-1"
-                   x-transition:enter-end="opacity-100 translate-y-0"
-                   x-transition:leave="transition ease-in duration-150"
-                   x-transition:leave-end="opacity-0 -translate-y-1"
-                   style="display:none">
+              <div class="nav-dd-panel hidden absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50">
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-2 min-w-[220px]">
                   @foreach($item['items'] as $sub)
                     <a href="{{ $sub['url'] }}"
                        @if(!empty($sub['external'])) target="_blank" rel="noreferrer" @endif
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-md hover:bg-surface-container-low
+                       class="nav-dd-link flex items-center gap-3 px-4 py-2.5 rounded-md hover:bg-slate-50
                               group/sub transition-colors cursor-pointer">
-                      <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center
-                                  group-hover/sub:bg-secondary-container transition-colors shrink-0">
-                        <i class="{{ $sub['icon'] }} text-on-surface-variant group-hover/sub:text-on-secondary-container text-sm"></i>
+                      <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center
+                                  group-hover/sub:bg-secondary/20 transition-colors shrink-0">
+                        <i class="{{ $sub['icon'] }} text-slate-500 group-hover/sub:text-secondary text-sm"></i>
                       </div>
-                      <span class="text-sm font-medium text-on-surface group-hover/sub:text-primary">
+                      <span class="text-sm font-medium text-slate-700 group-hover/sub:text-primary">
                         {{ $sub['label'] }}
                       </span>
                     </a>
@@ -147,40 +123,27 @@
             <a href="{{ $item['url'] }}"
                @if(!empty($item['external'])) target="_blank" rel="noreferrer" @endif
                class="px-3 py-2 text-[13px] font-semibold rounded-lg transition-all duration-200 cursor-pointer
-                      {{ request()->url() === $item['url'] ? 'text-secondary' : 'text-on-primary/80 hover:text-secondary hover:bg-white/10' }}">
+                      {{ request()->url() === $item['url'] ? 'text-secondary' : 'text-white/80 hover:text-secondary hover:bg-white/10' }}">
               {{ $item['label'] }}
             </a>
           @endif
         @endforeach
 
-        {{-- Search icon (desktop) --}}
-        <div class="relative ml-1" x-data>
-          <button @click="search = !search; $nextTick(() => search && $refs.searchInput.focus())"
-                  class="p-2.5 rounded-lg text-on-primary/70 hover:text-secondary hover:bg-white/10
+        {{-- Search --}}
+        <div class="relative ml-1">
+          <button id="search-toggle" type="button"
+                  class="p-2.5 rounded-lg text-white/70 hover:text-secondary hover:bg-white/10
                          transition-all duration-200 cursor-pointer"
-                  :class="search ? 'bg-white/10 text-secondary' : ''"
-                  :aria-label="'{{ $t('ຄົ້ນຫາ','Search','搜索') }}'">
-            <i x-show="!search" class="fas fa-search text-[14px]"></i>
-            <i x-show="search"  class="fas fa-times text-[14px]" style="display:none"></i>
+                  aria-label="{{ $t('ຄົ້ນຫາ','Search','搜索') }}">
+            <i id="search-icon" class="fas fa-search text-[14px]"></i>
           </button>
-
-          {{-- Search popover --}}
-          <div x-show="search"
-               x-transition:enter="transition ease-out duration-150"
-               x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
-               x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-               x-transition:leave="transition ease-in duration-100"
-               x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-               @click.outside="search = false"
-               @keydown.escape.window="search = false"
-               class="absolute top-full right-0 mt-2 w-72 z-50"
-               style="display:none">
+          <div id="search-panel" class="hidden absolute top-full right-0 mt-2 w-72 z-50">
             <form action="{{ $R('search') }}" method="GET"
                   class="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden flex">
-              <input x-ref="searchInput"
+              <input id="search-input"
                      type="text" name="q"
                      placeholder="{{ $t('ຄົ້ນຫາ...','Search...','搜索...') }}"
-                     class="flex-1 px-4 py-2.5 text-sm text-on-surface
+                     class="flex-1 px-4 py-2.5 text-sm text-slate-800
                             focus:outline-none placeholder:text-slate-400" />
               <button type="submit"
                       class="px-4 py-2.5 bg-primary text-on-primary text-sm
@@ -203,37 +166,30 @@
       {{-- Mobile: search + hamburger --}}
       <div class="lg:hidden flex items-center gap-1">
         <a href="{{ $R('search') }}"
-           class="p-2.5 rounded-md transition-colors cursor-pointer text-on-primary/80 hover:bg-white/10">
+           class="p-2.5 rounded-md transition-colors cursor-pointer text-white/80 hover:bg-white/10">
           <i class="fas fa-search text-base"></i>
         </a>
-        <button @click="open = !open"
-                class="p-2.5 rounded-md transition-colors cursor-pointer text-on-primary hover:bg-white/10">
-          <i x-show="!open"  class="fas fa-bars text-lg"></i>
-          <i x-show="open"   class="fas fa-times text-lg" style="display:none"></i>
+        <button id="mobile-menu-toggle" type="button"
+                class="p-2.5 rounded-md transition-colors cursor-pointer text-white hover:bg-white/10">
+          <i id="mobile-open-icon"  class="fas fa-bars text-lg"></i>
+          <i id="mobile-close-icon" class="fas fa-times text-lg hidden"></i>
         </button>
       </div>
     </div>
 
     {{-- Mobile menu --}}
-    <div x-show="open"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 max-h-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-end="opacity-0"
-         class="lg:hidden overflow-hidden pb-4"
-         style="display:none">
+    <div id="mobile-menu" class="hidden lg:hidden overflow-hidden pb-4">
       <div class="bg-white rounded-2xl p-2 flex flex-col gap-0.5 max-h-[75vh] overflow-y-auto
                   border border-slate-100 shadow-xl mt-2">
 
-        {{-- Mobile search bar --}}
+        {{-- Mobile search --}}
         <div class="px-2 pb-2 pt-1">
           <form action="{{ $R('search') }}" method="GET"
                 class="flex items-center gap-2 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden px-3">
             <i class="fas fa-search text-slate-400 text-xs shrink-0"></i>
             <input type="text" name="q"
                    placeholder="{{ $t('ຄົ້ນຫາ...','Search...','搜索...') }}"
-                   class="flex-1 py-2.5 text-sm bg-transparent text-on-surface
+                   class="flex-1 py-2.5 text-sm bg-transparent text-slate-800
                           focus:outline-none placeholder:text-slate-400" />
             <button type="submit" class="text-primary hover:text-secondary transition-colors cursor-pointer">
               <i class="fas fa-arrow-right text-xs"></i>
@@ -243,25 +199,22 @@
 
         @foreach($menu as $item)
           @if(!empty($item['items']))
-            <div class="rounded-xl overflow-hidden"
-                 x-data="{ sub: false }">
-              <button @click="sub = !sub"
-                      class="w-full flex justify-between items-center px-4 py-3 text-sm font-semibold
-                             text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors
+            <div class="rounded-xl overflow-hidden">
+              <button type="button"
+                      class="mobile-sub-toggle w-full flex justify-between items-center px-4 py-3 text-sm font-semibold
+                             text-slate-700 hover:text-primary hover:bg-slate-50 transition-colors
                              cursor-pointer rounded-xl">
                 {{ $item['label'] }}
-                <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"
-                   :class="sub ? 'rotate-180 text-blue-600' : 'text-slate-400'"></i>
+                <i class="mobile-sub-icon fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300"></i>
               </button>
-              <div x-show="sub" class="px-2 pb-1 flex flex-col gap-0.5" style="display:none">
+              <div class="mobile-sub-panel hidden px-2 pb-1 flex flex-col gap-0.5">
                 @foreach($item['items'] as $sub)
                   <a href="{{ $sub['url'] }}"
                      @if(!empty($sub['external'])) target="_blank" rel="noreferrer" @endif
-                     @click="open = false"
-                     class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium
-                            text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
+                     class="mobile-link flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium
+                            text-slate-600 hover:text-primary hover:bg-blue-50 rounded-xl transition-colors">
                     <span class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                      <i class="{{ $sub['icon'] }} text-blue-500 text-[9px]"></i>
+                      <i class="{{ $sub['icon'] }} text-primary text-[9px]"></i>
                     </span>
                     {{ $sub['label'] }}
                   </a>
@@ -271,14 +224,14 @@
           @elseif($item['url'])
             <a href="{{ $item['url'] }}"
                @if(!empty($item['external'])) target="_blank" rel="noreferrer" @endif
-               @click="open = false"
-               class="block px-4 py-3 text-sm font-medium rounded-xl transition-all cursor-pointer
-                      {{ request()->url() === $item['url'] ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+               class="mobile-link block px-4 py-3 text-sm font-medium rounded-xl transition-all cursor-pointer
+                      {{ request()->url() === $item['url'] ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-primary' }}">
               {{ $item['label'] }}
             </a>
           @endif
         @endforeach
-        {{-- Language switcher (mobile only) --}}
+
+        {{-- Language switcher (mobile) --}}
         <div class="px-2 pt-2 border-t border-slate-100 mt-1">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] px-1 mb-2">
             {{ $t('ພາສາ','Language','语言') }}
@@ -297,8 +250,8 @@
         </div>
 
         <div class="pt-2 px-2">
-          <a href="{{ $R('contact') }}" @click="open = false"
-             class="block text-center py-3 bg-secondary text-on-secondary text-sm font-bold rounded-md
+          <a href="{{ $R('contact') }}"
+             class="mobile-link block text-center py-3 bg-secondary text-on-secondary text-sm font-bold rounded-md
                     hover:bg-secondary-container hover:text-on-secondary-container transition-colors cursor-pointer">
             {{ $t('ຕິດຕໍ່ພວກເຮົາ','Contact Us','聯繫我們') }}
           </a>
@@ -308,3 +261,122 @@
 
   </div>
 </header>
+
+<script>
+(function () {
+  // ── Scroll: add blur/shadow when scrolled ──────────────────────────────────
+  var header = document.getElementById('site-header');
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 20) {
+      header.style.boxShadow = '0 1px 8px rgba(0,0,0,0.35)';
+    } else {
+      header.style.boxShadow = '';
+    }
+  }, { passive: true });
+
+  // ── Desktop dropdowns (click-based) ───────────────────────────────────────
+  function closeAllDropdowns() {
+    document.querySelectorAll('.nav-dd-panel').forEach(function (p) {
+      p.classList.add('hidden');
+    });
+    document.querySelectorAll('.nav-dd-icon').forEach(function (i) {
+      i.classList.remove('rotate-180');
+    });
+  }
+
+  document.querySelectorAll('.nav-dropdown').forEach(function (dd) {
+    var btn   = dd.querySelector('.nav-dd-btn');
+    var panel = dd.querySelector('.nav-dd-panel');
+    var icon  = dd.querySelector('.nav-dd-icon');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = !panel.classList.contains('hidden');
+      closeAllDropdowns();
+      if (!isOpen) {
+        panel.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        btn.classList.add('text-secondary', 'bg-white/10');
+      }
+    });
+
+    // Close when a link inside is clicked
+    panel.querySelectorAll('.nav-dd-link').forEach(function (link) {
+      link.addEventListener('click', function () { closeAllDropdowns(); });
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', closeAllDropdowns);
+
+  // Close on Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      closeAllDropdowns();
+      closeSearch();
+    }
+  });
+
+  // ── Search toggle ──────────────────────────────────────────────────────────
+  var searchToggle = document.getElementById('search-toggle');
+  var searchPanel  = document.getElementById('search-panel');
+  var searchInput  = document.getElementById('search-input');
+  var searchIcon   = document.getElementById('search-icon');
+
+  function closeSearch() {
+    if (!searchPanel) return;
+    searchPanel.classList.add('hidden');
+    if (searchIcon) { searchIcon.className = 'fas fa-search text-[14px]'; }
+  }
+
+  if (searchToggle) {
+    searchToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      var isOpen = !searchPanel.classList.contains('hidden');
+      if (isOpen) {
+        closeSearch();
+      } else {
+        searchPanel.classList.remove('hidden');
+        searchInput && searchInput.focus();
+      }
+    });
+    searchPanel && searchPanel.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
+
+  // ── Mobile menu toggle ─────────────────────────────────────────────────────
+  var mobileToggle    = document.getElementById('mobile-menu-toggle');
+  var mobileMenu      = document.getElementById('mobile-menu');
+  var mobileOpenIcon  = document.getElementById('mobile-open-icon');
+  var mobileCloseIcon = document.getElementById('mobile-close-icon');
+
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', function () {
+      var isOpen = !mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
+      mobileOpenIcon.classList.toggle('hidden', !isOpen);
+      mobileCloseIcon.classList.toggle('hidden', isOpen);
+    });
+  }
+
+  // Close mobile menu when a leaf link is clicked
+  document.querySelectorAll('.mobile-link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      mobileMenu && mobileMenu.classList.add('hidden');
+      mobileOpenIcon  && mobileOpenIcon.classList.remove('hidden');
+      mobileCloseIcon && mobileCloseIcon.classList.add('hidden');
+    });
+  });
+
+  // ── Mobile sub-menu toggles ────────────────────────────────────────────────
+  document.querySelectorAll('.mobile-sub-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panel = btn.nextElementSibling;
+      var icon  = btn.querySelector('.mobile-sub-icon');
+      panel.classList.toggle('hidden');
+      icon.classList.toggle('rotate-180');
+      icon.classList.toggle('text-primary');
+    });
+  });
+}());
+</script>

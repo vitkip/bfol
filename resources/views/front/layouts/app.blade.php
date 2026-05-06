@@ -45,24 +45,31 @@
   @include('front._partials.banner', ['position' => 'popup'])
 
   {{-- Back to top --}}
-  <div x-data="{ show: false }"
-       x-init="window.addEventListener('scroll', () => { show = window.scrollY > 450 }, { passive: true })">
-    <button
-      x-show="show"
-      x-transition:enter="transition ease-out duration-300"
-      x-transition:enter-start="opacity-0 translate-y-4"
-      x-transition:enter-end="opacity-100 translate-y-0"
-      x-transition:leave="transition ease-in duration-200"
-      x-transition:leave-end="opacity-0 translate-y-4"
-      @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-      aria-label="Back to top"
-      class="fixed bottom-6 right-6 z-50 cursor-pointer w-12 h-12 rounded-full
-             bg-primary text-secondary border border-secondary/20 shadow-lg shadow-primary/30
-             flex items-center justify-center hover:bg-primary-container hover:-translate-y-1
-             active:scale-95 transition-all duration-300">
-      <i class="fas fa-arrow-up text-sm"></i>
-    </button>
-  </div>
+  <button id="back-to-top"
+    aria-label="Back to top"
+    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    class="fixed bottom-6 right-6 z-50 cursor-pointer w-12 h-12 rounded-full
+           bg-primary text-secondary border border-secondary/20 shadow-lg shadow-primary/30
+           flex items-center justify-center hover:bg-primary-container hover:-translate-y-1
+           active:scale-95 transition-all duration-300
+           opacity-0 pointer-events-none translate-y-4"
+    style="transition: opacity 0.3s, transform 0.3s">
+    <i class="fas fa-arrow-up text-sm"></i>
+  </button>
+  <script>
+  (function(){
+    var btn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', function(){
+      if (window.scrollY > 450) {
+        btn.classList.remove('opacity-0','pointer-events-none','translate-y-4');
+        btn.classList.add('opacity-100','translate-y-0');
+      } else {
+        btn.classList.add('opacity-0','pointer-events-none','translate-y-4');
+        btn.classList.remove('opacity-100','translate-y-0');
+      }
+    }, { passive: true });
+  }());
+  </script>
 
   @stack('scripts')
 </body>

@@ -12,6 +12,7 @@ class SecurityHeaders
     private const SCRIPT_SRCS = [
         "'self'",
         "'unsafe-inline'",          // admin Tailwind inline config + Alpine x-data attributes
+        "'unsafe-eval'",            // Alpine.js v3 requires new Function() for expression evaluation
         'https://cdn.tailwindcss.com',
         'https://cdn.jsdelivr.net',
         'https://cdnjs.cloudflare.com',
