@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -61,6 +62,8 @@ class PageController extends Controller
         $validated['sort_order']   = (int) $request->input('sort_order', 0);
         $validated['author_id']    = auth()->id();
 
+        HtmlPurifier::cleanFields($validated, ['content_lo', 'content_en', 'content_zh']);
+
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('pages/thumbnails', 'public');
         }
@@ -111,6 +114,8 @@ class PageController extends Controller
         $validated['slug']         = $request->filled('slug') ? $validated['slug'] : $page->slug;
         $validated['is_published'] = $request->boolean('is_published');
         $validated['sort_order']   = (int) $request->input('sort_order', 0);
+
+        HtmlPurifier::cleanFields($validated, ['content_lo', 'content_en', 'content_zh']);
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('pages/thumbnails', 'public');

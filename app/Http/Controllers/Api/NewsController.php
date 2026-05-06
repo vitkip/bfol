@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -61,6 +62,8 @@ class NewsController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('news/thumbnails', 'public');
         }
 
+        HtmlPurifier::cleanFields($data, ['content_lo', 'content_en', 'content_zh']);
+
         $data['author_id'] = $request->user()->id;
 
         if ($data['status'] === 'published' && empty($data['published_at'])) {
@@ -108,6 +111,8 @@ class NewsController extends Controller
         } else {
             unset($data['thumbnail']);
         }
+
+        HtmlPurifier::cleanFields($data, ['content_lo', 'content_en', 'content_zh']);
 
         if ($data['status'] === 'published' && ! $news->published_at && empty($data['published_at'])) {
             $data['published_at'] = now();

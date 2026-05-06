@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -63,6 +64,8 @@ class EventController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('events/thumbnails', 'public');
         }
 
+        HtmlPurifier::cleanFields($data, ['description_lo', 'description_en', 'description_zh']);
+
         $data['author_id'] = $request->user()->id;
 
         $event = Event::create($data);
@@ -109,6 +112,8 @@ class EventController extends Controller
         } else {
             unset($data['thumbnail']);
         }
+
+        HtmlPurifier::cleanFields($data, ['description_lo', 'description_en', 'description_zh']);
 
         $event->update($data);
 

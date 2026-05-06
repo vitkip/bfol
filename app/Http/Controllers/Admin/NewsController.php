@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\News;
 use App\Models\Tag;
+use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -80,6 +81,8 @@ class NewsController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('news/thumbnails', 'public');
         }
 
+        HtmlPurifier::cleanFields($data, ['content_lo', 'content_en', 'content_zh']);
+
         $data['is_featured'] = $request->boolean('is_featured');
         $data['is_urgent']   = $request->boolean('is_urgent');
         $data['author_id']   = auth()->id();
@@ -137,6 +140,8 @@ class NewsController extends Controller
         } else {
             unset($data['thumbnail']);
         }
+
+        HtmlPurifier::cleanFields($data, ['content_lo', 'content_en', 'content_zh']);
 
         $data['is_featured'] = $request->boolean('is_featured');
         $data['is_urgent']   = $request->boolean('is_urgent');

@@ -14,6 +14,12 @@ use Mpdf\Mpdf;
 
 class PdfController extends Controller
 {
+    private function e(?string $value, string $fallback = '-'): string
+    {
+        $v = $value !== null && $value !== '' ? $value : $fallback;
+        return htmlspecialchars($v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
     private function mpdf(string $title): Mpdf
     {
         $mpdf = new Mpdf([
@@ -76,15 +82,15 @@ class PdfController extends Controller
                 'published' => 'ເຜີຍແຜ່',
                 'draft'     => 'ຮ່າງ',
                 'archived'  => 'ເກັບ',
-                default     => $n->status,
+                default     => $this->e($n->status),
             };
             $html .= '<tr>';
             $html .= '<td>' . ($i + 1) . '</td>';
-            $html .= '<td>' . ($n->title_lo ?: $n->title_en) . '</td>';
-            $html .= '<td>' . ($n->category?->name_lo ?? '-') . '</td>';
+            $html .= '<td>' . $this->e($n->title_lo ?: $n->title_en) . '</td>';
+            $html .= '<td>' . $this->e($n->category?->name_lo) . '</td>';
             $html .= '<td><span class="badge ' . $badge . '">' . $status_label . '</span></td>';
-            $html .= '<td>' . ($n->author?->full_name_lo ?: '-') . '</td>';
-            $html .= '<td>' . ($n->published_at?->format('d/m/Y') ?? $n->created_at?->format('d/m/Y')) . '</td>';
+            $html .= '<td>' . $this->e($n->author?->full_name_lo) . '</td>';
+            $html .= '<td>' . ($n->published_at?->format('d/m/Y') ?? $n->created_at?->format('d/m/Y') ?? '-') . '</td>';
             $html .= '</tr>';
         }
 
@@ -121,12 +127,12 @@ class PdfController extends Controller
                 'ongoing'   => 'ດຳເນີນຢູ່',
                 'completed' => 'ສຳເລັດ',
                 'cancelled' => 'ຍົກເລີກ',
-                default     => $e->status,
+                default     => $this->e($e->status),
             };
             $html .= '<tr>';
             $html .= '<td>' . ($i + 1) . '</td>';
-            $html .= '<td>' . ($e->title_lo ?: $e->title_en) . '</td>';
-            $html .= '<td>' . ($e->location_lo ?: '-') . '</td>';
+            $html .= '<td>' . $this->e($e->title_lo ?: $e->title_en) . '</td>';
+            $html .= '<td>' . $this->e($e->location_lo) . '</td>';
             $html .= '<td>' . ($e->start_date?->format('d/m/Y') ?? '-') . '</td>';
             $html .= '<td><span class="badge ' . $badge . '">' . $status_label . '</span></td>';
             $html .= '</tr>';
@@ -152,14 +158,19 @@ class PdfController extends Controller
         $html .= '</tr>';
 
         foreach ($items as $i => $p) {
-            $badge = $p->status === 'active' ? 'badge-green' : 'badge-gray';
-            $status_lo = $p->status === 'active' ? 'ເຄື່ອນໄຫວ' : ($p->status === 'inactive' ? 'ບໍ່ເຄື່ອນໄຫວ' : 'ລໍຖ້າ');
+            $badge     = $p->status === 'active' ? 'badge-green' : 'badge-gray';
+            $status_lo = match ($p->status) {
+                'active'   => 'ເຄື່ອນໄຫວ',
+                'inactive' => 'ບໍ່ເຄື່ອນໄຫວ',
+                'pending'  => 'ລໍຖ້າ',
+                default    => $this->e($p->status),
+            };
             $html .= '<tr>';
             $html .= '<td>' . ($i + 1) . '</td>';
-            $html .= '<td>' . ($p->name_lo ?: $p->name_en) . '</td>';
-            $html .= '<td>' . ($p->acronym ?? '-') . '</td>';
-            $html .= '<td>' . ($p->country_name_lo ?: $p->country_name_en ?? '-') . '</td>';
-            $html .= '<td>' . ($p->type ?? '-') . '</td>';
+            $html .= '<td>' . $this->e($p->name_lo ?: $p->name_en) . '</td>';
+            $html .= '<td>' . $this->e($p->acronym) . '</td>';
+            $html .= '<td>' . $this->e($p->country_name_lo ?: $p->country_name_en) . '</td>';
+            $html .= '<td>' . $this->e($p->type) . '</td>';
             $html .= '<td><span class="badge ' . $badge . '">' . $status_lo . '</span></td>';
             $html .= '</tr>';
         }
@@ -195,12 +206,12 @@ class PdfController extends Controller
                 'expired'    => 'ໝົດອາຍຸ',
                 'pending'    => 'ລໍຖ້າ',
                 'terminated' => 'ຍົກເລີກ',
-                default      => $m->status,
+                default      => $this->e($m->status),
             };
             $html .= '<tr>';
             $html .= '<td>' . ($i + 1) . '</td>';
-            $html .= '<td>' . ($m->title_lo ?: $m->title_en) . '</td>';
-            $html .= '<td>' . ($m->partnerOrganization?->name_lo ?: '-') . '</td>';
+            $html .= '<td>' . $this->e($m->title_lo ?: $m->title_en) . '</td>';
+            $html .= '<td>' . $this->e($m->partnerOrganization?->name_lo) . '</td>';
             $html .= '<td>' . ($m->signed_date?->format('d/m/Y') ?? '-') . '</td>';
             $html .= '<td>' . ($m->expiry_date?->format('d/m/Y') ?? '-') . '</td>';
             $html .= '<td><span class="badge ' . $badge . '">' . $status_lo . '</span></td>';
@@ -227,14 +238,14 @@ class PdfController extends Controller
         $html .= '</tr>';
 
         foreach ($items as $i => $m) {
-            $badge = $m->is_active ? 'badge-green' : 'badge-gray';
+            $badge     = $m->is_active ? 'badge-green' : 'badge-gray';
             $status_lo = $m->is_active ? 'ເຄື່ອນໄຫວ' : 'ບໍ່ເຄື່ອນໄຫວ';
             $html .= '<tr>';
             $html .= '<td>' . ($i + 1) . '</td>';
-            $html .= '<td>' . ($m->name_lo ?: $m->name_en) . '</td>';
-            $html .= '<td>' . ($m->position_lo ?: '-') . '</td>';
-            $html .= '<td>' . ($m->department ?? '-') . '</td>';
-            $html .= '<td>' . ($m->email ?? '-') . '</td>';
+            $html .= '<td>' . $this->e($m->name_lo ?: $m->name_en) . '</td>';
+            $html .= '<td>' . $this->e($m->position_lo) . '</td>';
+            $html .= '<td>' . $this->e($m->department) . '</td>';
+            $html .= '<td>' . $this->e($m->email) . '</td>';
             $html .= '<td><span class="badge ' . $badge . '">' . $status_lo . '</span></td>';
             $html .= '</tr>';
         }

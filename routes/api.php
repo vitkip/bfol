@@ -34,50 +34,35 @@ Route::prefix('public')->group(function () {
 });
 
 // ─── AUTH (public) ───────────────────────────────────────────────────────────
-Route::post('login',  [AuthController::class, 'login']);
+Route::post('login',  [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// ─── PROTECTED API ───────────────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+// ─── VIEWER+ : ອ່ານໄດ້ທຸກ role ──────────────────────────────────────────────
+Route::middleware(['auth:sanctum', 'admin.role'])->group(function () {
 
     Route::get('user', [AuthController::class, 'user']);
 
     // Dashboard
-    Route::get('dashboard', [DashboardController::class, 'index']);
+    Route::get('dashboard',       [DashboardController::class, 'index']);
     Route::get('dashboard/chart', [DashboardController::class, 'chart']);
 
-    // News
-    Route::apiResource('news', NewsController::class);
-    Route::patch('news/{news}/status', [NewsController::class, 'updateStatus']);
+    // Read-only resources
+    Route::apiResource('news',          NewsController::class)->only(['index', 'show']);
+    Route::apiResource('events',        EventController::class)->only(['index', 'show']);
+    Route::apiResource('partners',      PartnerController::class)->only(['index', 'show']);
+    Route::apiResource('mou',           MouController::class)->only(['index', 'show']);
+    Route::apiResource('committee',     CommitteeController::class)->only(['index', 'show']);
+    Route::apiResource('monk-programs', MonkProgramController::class)->only(['index', 'show']);
+    Route::apiResource('aid-projects',  AidProjectController::class)->only(['index', 'show']);
 
-    // Events
-    Route::apiResource('events', EventController::class);
-    Route::patch('events/{event}/status', [EventController::class, 'updateStatus']);
-
-    // Partners
-    Route::apiResource('partners', PartnerController::class);
-
-    // MOU Agreements
-    Route::apiResource('mou', MouController::class);
-
-    // Committee Members
-    Route::apiResource('committee', CommitteeController::class);
-
-    // Monk Exchange Programs
-    Route::apiResource('monk-programs', MonkProgramController::class);
-
-    // Aid Projects
-    Route::apiResource('aid-projects', AidProjectController::class);
-
-    // Categories & Tags (reference data)
+    // Reference data
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('tags',       [TagController::class, 'index']);
 
-    // Contacts (read-only from admin side)
-    Route::get('contacts',              [ContactController::class, 'index']);
-    Route::get('contacts/{contact}',    [ContactController::class, 'show']);
+    // Contacts read + mark-read
+    Route::get('contacts',                  [ContactController::class, 'index']);
+    Route::get('contacts/{contact}',        [ContactController::class, 'show']);
     Route::patch('contacts/{contact}/read', [ContactController::class, 'markRead']);
-    Route::delete('contacts/{contact}', [ContactController::class, 'destroy']);
 
     // Statistics / Charts
     Route::get('statistics', [StatisticsController::class, 'index']);
@@ -88,4 +73,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('pdf/partners',  [PdfController::class, 'partners']);
     Route::get('pdf/mou',       [PdfController::class, 'mou']);
     Route::get('pdf/committee', [PdfController::class, 'committee']);
+});
+
+// ─── EDITOR+ : ຂຽນ/ແກ້ໄຂ/ລຶບ content ────────────────────────────────────────
+Route::middleware(['auth:sanctum', 'admin.role:editor'])->group(function () {
+
+    // News
+    Route::apiResource('news', NewsController::class)->except(['index', 'show']);
+    Route::patch('news/{news}/status', [NewsController::class, 'updateStatus']);
+
+    // Events
+    Route::apiResource('events', EventController::class)->except(['index', 'show']);
+    Route::patch('events/{event}/status', [EventController::class, 'updateStatus']);
+
+    // Partners
+    Route::apiResource('partners',      PartnerController::class)->except(['index', 'show']);
+    Route::apiResource('mou',           MouController::class)->except(['index', 'show']);
+    Route::apiResource('monk-programs', MonkProgramController::class)->except(['index', 'show']);
+    Route::apiResource('aid-projects',  AidProjectController::class)->except(['index', 'show']);
+
+    // Contacts delete
+    Route::delete('contacts/{contact}', [ContactController::class, 'destroy']);
+});
+
+// ─── ADMIN+ : ຂຽນ/ແກ້ໄຂ/ລຶບ org config (ກົງກັບ web.php) ─────────────────────
+Route::middleware(['auth:sanctum', 'admin.role:admin'])->group(function () {
+    Route::apiResource('committee', CommitteeController::class)->except(['index', 'show']);
 });

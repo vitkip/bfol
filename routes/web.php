@@ -43,7 +43,7 @@ use Illuminate\Support\Facades\Route;
 // ─── ADMIN AUTH (no locale prefix) ───────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login',  [AdminAuth::class, 'showLogin'])->name('login');
-    Route::post('login', [AdminAuth::class, 'login'])->name('login.post');
+    Route::post('login', [AdminAuth::class, 'login'])->middleware('throttle:5,1')->name('login.post');
     Route::post('logout',[AdminAuth::class, 'logout'])->name('logout');
 });
 

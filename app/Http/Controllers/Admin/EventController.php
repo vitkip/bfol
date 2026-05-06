@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Event;
 use App\Http\Controllers\Controller;
+use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -46,6 +47,8 @@ class EventController extends Controller
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('events/thumbnails', 'public');
         }
+
+        HtmlPurifier::cleanFields($validated, ['description_lo', 'description_en', 'description_zh']);
 
         $validated['is_featured']      = $request->boolean('is_featured');
         $validated['is_international'] = $request->boolean('is_international');
@@ -90,6 +93,8 @@ class EventController extends Controller
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('events/thumbnails', 'public');
         }
+
+        HtmlPurifier::cleanFields($validated, ['description_lo', 'description_en', 'description_zh']);
 
         $validated['is_featured']      = $request->boolean('is_featured');
         $validated['is_international'] = $request->boolean('is_international');
