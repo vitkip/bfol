@@ -113,16 +113,7 @@
         @endif
       </div>
 
-      <div>
-        <label class="block text-xs font-semibold mb-1">Icon (Font Awesome class)</label>
-        <div class="flex items-center gap-2">
-          <i id="icon-preview" class="fas fa-bars text-blue-600 w-5 text-center"></i>
-          <input type="text" name="icon" id="icon-input" value="{{ old('icon') }}"
-                 class="flex-1 rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                 placeholder="fas fa-globe">
-        </div>
-        <p class="text-xs text-outline mt-1">ໃຊ້ຊື່ class Font Awesome ເຊັ່ນ: <code class="bg-surface-container px-1 rounded">fas fa-globe</code></p>
-      </div>
+      @include('admin.navigation._icon_picker', ['currentIcon' => old('icon', '')])
     </div>
 
     {{-- ── ໂຄງສ້າງ ── --}}
@@ -137,7 +128,7 @@
           <select name="parent_id"
                   class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option value="">— ບໍ່ມີ (ລະດັບຫຼັກ) —</option>
-            @foreach($parents as $p)
+            @foreach($parentList as $p)
               <option value="{{ $p->id }}" {{ old('parent_id') == $p->id ? 'selected' : '' }}>
                 {{ $p->label_lo }}
               </option>
@@ -188,12 +179,6 @@
 
 @push('scripts')
 <script>
-  document.getElementById('icon-input').addEventListener('input', function() {
-    const preview = document.getElementById('icon-preview');
-    preview.className = this.value || 'fas fa-bars';
-    preview.classList.add('text-blue-600', 'w-5', 'text-center');
-  });
-
   function setUrl(url) {
     document.getElementById('url-input').value = url;
     document.getElementById('url-input').focus();

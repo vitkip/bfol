@@ -12,7 +12,7 @@ class NavigationMenuController extends Controller
 {
     public function index()
     {
-        $menus = NavigationMenu::with('children')
+        $menus = NavigationMenu::with('children.children.children')
             ->topLevel()
             ->orderBy('sort_order')
             ->get();
@@ -22,9 +22,11 @@ class NavigationMenuController extends Controller
 
     public function create()
     {
-        $parents = NavigationMenu::topLevel()->orderBy('sort_order')->get();
-        $pages   = Page::published()->select('id', 'slug', 'title_lo', 'title_en')->orderBy('title_lo')->get();
-        return view('admin.navigation.create', compact('parents', 'pages'));
+        $parentList = $this->buildParentList(
+            NavigationMenu::with('children.children')->whereNull('parent_id')->orderBy('sort_order')->get()
+        );
+        $pages = Page::published()->select('id', 'slug', 'title_lo', 'title_en')->orderBy('title_lo')->get();
+        return view('admin.navigation.create', compact('parentList', 'pages'));
     }
 
     public function store(Request $request)
@@ -59,13 +61,39 @@ class NavigationMenuController extends Controller
 
     public function edit(NavigationMenu $navigation)
     {
-        $parents = NavigationMenu::topLevel()
-            ->where('id', '!=', $navigation->id)
-            ->orderBy('sort_order')
-            ->get();
+        $navigation->load('children.children.children');
+        $excludeIds = $this->getDescendantIds($navigation);
+
+        $parentList = $this->buildParentList(
+            NavigationMenu::with('children.children')->whereNull('parent_id')->orderBy('sort_order')->get(),
+            $excludeIds
+        );
         $pages = Page::published()->select('id', 'slug', 'title_lo', 'title_en')->orderBy('title_lo')->get();
 
-        return view('admin.navigation.edit', compact('navigation', 'parents', 'pages'));
+        return view('admin.navigation.edit', compact('navigation', 'parentList', 'pages'));
+    }
+
+    private function buildParentList($menus, array $excludeIds = [], int $depth = 0): array
+    {
+        $list = [];
+        foreach ($menus as $menu) {
+            if (in_array($menu->id, $excludeIds)) continue;
+            $indent = str_repeat('　', $depth) . ($depth > 0 ? '└ ' : '');
+            $list[] = (object)['id' => $menu->id, 'label_lo' => $indent . $menu->label_lo];
+            if ($menu->children->isNotEmpty()) {
+                $list = array_merge($list, $this->buildParentList($menu->children, $excludeIds, $depth + 1));
+            }
+        }
+        return $list;
+    }
+
+    private function getDescendantIds(NavigationMenu $menu): array
+    {
+        $ids = [$menu->id];
+        foreach ($menu->children as $child) {
+            $ids = array_merge($ids, $this->getDescendantIds($child));
+        }
+        return $ids;
     }
 
     public function update(Request $request, NavigationMenu $navigation)

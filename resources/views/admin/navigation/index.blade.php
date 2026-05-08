@@ -40,120 +40,16 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-surface-container-high">
-        @forelse($menus as $menu)
-
-          {{-- Top-level item --}}
-          <tr class="hover:bg-surface-container-low transition-colors bg-blue-50/30">
-            <td class="px-4 py-3 text-outline text-xs">{{ $menu->id }}</td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2">
-                @if($menu->icon)
-                  <i class="{{ $menu->icon }} text-blue-600 w-4 text-center text-xs"></i>
-                @else
-                  <i class="fas fa-bars text-blue-300 w-4 text-center text-xs"></i>
-                @endif
-                <div>
-                  <p class="font-semibold text-on-surface">{{ $menu->label_lo }}</p>
-                  @if($menu->label_en)
-                    <p class="text-xs text-outline">{{ $menu->label_en }}</p>
-                  @endif
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-3 hidden md:table-cell">
-              @if($menu->url)
-                <code class="text-xs bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">{{ $menu->url }}</code>
-              @else
-                <span class="text-xs text-outline italic">dropdown</span>
-              @endif
-            </td>
-            <td class="px-4 py-3 text-center hidden lg:table-cell text-xs text-outline">{{ $menu->sort_order }}</td>
-            <td class="px-4 py-3 text-center">
-              @if($menu->is_active)
-                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
-                  <i class="fas fa-circle text-[6px]"></i> ເປີດ
-                </span>
-              @else
-                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
-                  <i class="fas fa-circle text-[6px]"></i> ປິດ
-                </span>
-              @endif
-            </td>
-            <td class="px-4 py-3 text-right">
-              <div class="flex items-center justify-end gap-3">
-                <a href="{{ route('admin.navigation.edit', $menu) }}"
-                   class="inline-flex items-center gap-1 text-xs font-semibold text-yellow-600 hover:underline">
-                  <i class="fas fa-edit"></i><span class="hidden sm:inline">ແກ້ໄຂ</span>
-                </a>
-                <form action="{{ route('admin.navigation.destroy', $menu) }}" method="POST" class="inline-block"
-                      onsubmit="return confirm('ລຶບ «{{ $menu->label_lo }}» ແທ້ບໍ?')">
-                  @csrf @method('DELETE')
-                  <button type="submit" class="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline">
-                    <i class="fas fa-trash"></i><span class="hidden sm:inline">ລຶບ</span>
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-
-          {{-- Sub-items --}}
-          @foreach($menu->children as $child)
-          <tr class="hover:bg-surface-container-low transition-colors">
-            <td class="px-4 py-2 text-outline text-xs">{{ $child->id }}</td>
-            <td class="px-4 py-2">
-              <div class="flex items-center gap-2 pl-6">
-                <i class="fas fa-level-up-alt fa-rotate-90 text-outline text-xs w-4 text-center"></i>
-                <div>
-                  <p class="text-on-surface text-sm">{{ $child->label_lo }}</p>
-                  @if($child->label_en)
-                    <p class="text-xs text-outline">{{ $child->label_en }}</p>
-                  @endif
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-2 hidden md:table-cell">
-              @if($child->url)
-                <code class="text-xs bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">{{ $child->url }}</code>
-              @endif
-            </td>
-            <td class="px-4 py-2 text-center hidden lg:table-cell text-xs text-outline">{{ $child->sort_order }}</td>
-            <td class="px-4 py-2 text-center">
-              @if($child->is_active)
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700">
-                  <i class="fas fa-circle text-[6px]"></i> ເປີດ
-                </span>
-              @else
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
-                  <i class="fas fa-circle text-[6px]"></i> ປິດ
-                </span>
-              @endif
-            </td>
-            <td class="px-4 py-2 text-right">
-              <div class="flex items-center justify-end gap-3">
-                <a href="{{ route('admin.navigation.edit', $child) }}"
-                   class="inline-flex items-center gap-1 text-xs font-semibold text-yellow-600 hover:underline">
-                  <i class="fas fa-edit"></i><span class="hidden sm:inline">ແກ້ໄຂ</span>
-                </a>
-                <form action="{{ route('admin.navigation.destroy', $child) }}" method="POST" class="inline-block"
-                      onsubmit="return confirm('ລຶບ «{{ $child->label_lo }}» ແທ້ບໍ?')">
-                  @csrf @method('DELETE')
-                  <button type="submit" class="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline">
-                    <i class="fas fa-trash"></i><span class="hidden sm:inline">ລຶບ</span>
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          @endforeach
-
-        @empty
+        @if($menus->isEmpty())
         <tr>
           <td colspan="6" class="text-center text-outline py-12">
             <i class="fas fa-bars text-3xl mb-2 block opacity-30"></i>
             ຍັງບໍ່ມີລາຍການເມນູ
           </td>
         </tr>
-        @endforelse
+        @else
+          @include('admin.navigation._menu_tree', ['menus' => $menus, 'depth' => 0])
+        @endif
       </tbody>
     </table>
   </div>

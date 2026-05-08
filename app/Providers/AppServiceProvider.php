@@ -50,7 +50,11 @@ class AppServiceProvider extends ServiceProvider
             static $navMenus = null;
             if ($navMenus === null) {
                 $navMenus = \App\Models\NavigationMenu::active()
-                    ->with(['children' => fn($q) => $q->active()->orderBy('sort_order')])
+                    ->with(['children' => fn($q) => $q->active()->orderBy('sort_order')
+                        ->with(['children' => fn($q2) => $q2->active()->orderBy('sort_order')
+                            ->with(['children' => fn($q3) => $q3->active()->orderBy('sort_order')])
+                        ])
+                    ])
                     ->whereNull('parent_id')
                     ->orderBy('sort_order')
                     ->get();
