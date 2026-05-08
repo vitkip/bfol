@@ -9,6 +9,15 @@
             "command": "bash /Applications/XAMPP/xamppfiles/htdocs/bfol/scripts/ftp-upload.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Applications/XAMPP/xamppfiles/htdocs/bfol/scripts/full-deploy.sh"
+          }
+        ]
       }
     ]
   }
