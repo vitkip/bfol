@@ -235,8 +235,7 @@
         </a>
         <button id="mobile-menu-toggle" type="button"
                 class="p-2.5 rounded-md transition-colors cursor-pointer text-white hover:bg-white/10">
-          <i id="mobile-open-icon"  class="fas fa-bars text-lg"></i>
-          <i id="mobile-close-icon" class="fas fa-times text-lg hidden"></i>
+          <i class="fas fa-bars text-lg"></i>
         </button>
       </div>
     </div>
@@ -488,26 +487,19 @@
   }
 
   // ── Mobile menu toggle ─────────────────────────────────────────────────
-  var mobileToggle    = document.getElementById('mobile-menu-toggle');
-  var mobileMenu      = document.getElementById('mobile-menu');
-  var mobileOpenIcon  = document.getElementById('mobile-open-icon');
-  var mobileCloseIcon = document.getElementById('mobile-close-icon');
+  var mobileToggle = document.getElementById('mobile-menu-toggle');
+  var mobileMenu   = document.getElementById('mobile-menu');
 
   if (mobileToggle) {
     mobileToggle.addEventListener('click', function () {
-      var isOpen = !mobileMenu.classList.contains('hidden');
       mobileMenu.classList.toggle('hidden');
-      mobileOpenIcon.classList.toggle('hidden', !isOpen);
-      mobileCloseIcon.classList.toggle('hidden', isOpen);
     });
   }
 
   // Close mobile menu when leaf link is clicked
   document.querySelectorAll('.mobile-link').forEach(function (link) {
     link.addEventListener('click', function () {
-      mobileMenu      && mobileMenu.classList.add('hidden');
-      mobileOpenIcon  && mobileOpenIcon.classList.remove('hidden');
-      mobileCloseIcon && mobileCloseIcon.classList.add('hidden');
+      mobileMenu && mobileMenu.classList.add('hidden');
     });
   });
 
