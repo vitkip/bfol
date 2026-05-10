@@ -17,7 +17,6 @@ Thumbs.db
 /.zed
 /auth.json
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /public/clear_cache.php
