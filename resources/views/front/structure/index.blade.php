@@ -106,6 +106,11 @@
     justify-items:center;
   }
 
+  /* Hide the upward stem on the root ul and root li */
+  .org-chart > ul::before { display: none; }
+  .org-chart > ul > li::before,
+  .org-chart > ul > li::after { display: none; }
+
   /* ─── Dot background ─── */
   .dot-pattern {
     background-image:radial-gradient(circle,rgba(255,255,255,.12) 1px,transparent 1px);
@@ -190,7 +195,7 @@
             @endphp
             <div class="flex flex-col items-center group">
               {{-- Photo --}}
-              <div class="relative mb-3">
+              <div class="mb-2">
                 <div class="w-28 h-28 rounded-full ring-4 ring-amber-400 ring-offset-4 ring-offset-slate-50
                             shadow-xl shadow-amber-200 overflow-hidden bg-white
                             group-hover:ring-secondary transition-all duration-300">
@@ -203,11 +208,10 @@
                     </div>
                   @endif
                 </div>
-                {{-- Crown badge --}}
-                <div class="absolute -top-1 left-1/2 -translate-x-1/2 bg-amber-400 text-white
-                            text-[9px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap">
-                  <i class="fas fa-star text-[7px] mr-0.5"></i>{{ $t('ປະທານ','President','主席') }}
-                </div>
+              </div>
+              {{-- Crown badge below photo --}}
+              <div class="bg-amber-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap mb-3">
+                <i class="fas fa-star text-[7px] mr-0.5"></i>{{ $t('ປະທານ','President','主席') }}
               </div>
 
               {{-- Info card --}}
@@ -450,7 +454,7 @@
         $pPos  = $tf($president,'position') ?: $president->position_lo;
       @endphp
       <div class="flex flex-col items-center mb-8">
-        <div class="relative mb-3">
+        <div class="mb-2">
           <div class="w-24 h-24 rounded-full ring-4 ring-amber-400 ring-offset-2 overflow-hidden bg-white shadow-xl">
             @if($president->photo_url)
               <img src="{{ $president->photo_url }}" alt="{{ $pName }}" class="w-full h-full object-cover" />
@@ -460,10 +464,9 @@
               </div>
             @endif
           </div>
-          <div class="absolute -top-1 left-1/2 -translate-x-1/2 bg-amber-400 text-white
-                      text-[9px] font-black px-2 py-0.5 rounded-full whitespace-nowrap">
-            <i class="fas fa-star text-[7px] mr-0.5"></i>{{ $t('ປະທານ','President','主席') }}
-          </div>
+        </div>
+        <div class="bg-amber-400 text-white text-[9px] font-black px-2 py-0.5 rounded-full whitespace-nowrap mb-3">
+          <i class="fas fa-star text-[7px] mr-0.5"></i>{{ $t('ປະທານ','President','主席') }}
         </div>
         <div class="bg-white rounded-2xl shadow-lg border border-amber-100 px-5 py-3 text-center w-full max-w-xs">
           <p class="font-bold text-on-surface">{{ $pName }}</p>
