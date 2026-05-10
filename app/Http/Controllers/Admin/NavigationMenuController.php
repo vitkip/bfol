@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NavigationMenu;
 use App\Models\Page;
+use App\Services\CacheInvalidator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -54,6 +55,8 @@ class NavigationMenuController extends Controller
             'sort_order' => (int) $request->input('sort_order', 0),
             'is_active'  => $request->boolean('is_active', true),
         ]);
+
+        CacheInvalidator::navigation();
 
         return redirect()->route('admin.navigation.index')
             ->with('success', 'ເພີ່ມລາຍການເມນູສຳເລັດ');
@@ -122,6 +125,8 @@ class NavigationMenuController extends Controller
             'is_active'  => $request->boolean('is_active', true),
         ]);
 
+        CacheInvalidator::navigation();
+
         return redirect()->route('admin.navigation.index')
             ->with('success', 'ແກ້ໄຂເມນູສຳເລັດ');
     }
@@ -133,6 +138,8 @@ class NavigationMenuController extends Controller
         }
 
         $navigation->delete();
+
+        CacheInvalidator::navigation();
 
         return redirect()->route('admin.navigation.index')
             ->with('success', 'ລຶບເມນູສຳເລັດ');
