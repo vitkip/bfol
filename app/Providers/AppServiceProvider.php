@@ -19,12 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share $settings and $locale with every front.* Blade view
         \Illuminate\Support\Facades\View::composer('front.*', function ($view) {
-            static $settings     = null;
-            static $bannersByPos = null;
-
-            if ($settings === null) {
+            // Cache as plain array (stdClass fails to unserialize from file cache).
+            // Cast to object after retrieval so Blade views keep $settings->key syntax.
+            $settingsArr = \Illuminate\Support\Facades\Cache::remember('site_settings', 3600, function () {
                 $keys = [
                     'site_name_lo','site_name_en','site_name_zh',
                     'site_phone','site_email',
@@ -32,24 +30,27 @@ class AppServiceProvider extends ServiceProvider
                     'site_facebook','site_youtube','site_line','site_wechat','site_whatsapp',
                     'logo_url','favicon_url','office_hours_lo',
                 ];
-                $data = [];
-                foreach ($keys as $k) {
-                    $data[$k] = \App\Models\SiteSetting::get($k, '');
-                }
-                $settings = (object) $data;
-            }
+                $rows = \App\Models\SiteSetting::whereIn('key', $keys)->get(['key','value'])->pluck('value','key');
+                return collect($keys)->mapWithKeys(fn($k) => [$k => $rows[$k] ?? ''])->all();
+            });
+            $settings = (object) $settingsArr;
 
-            if ($bannersByPos === null) {
-                $bannersByPos = \App\Models\Banner::active()
+            // Cache as plain arrays to avoid Eloquent Collection unserialize errors.
+            $bannersArr = \Illuminate\Support\Facades\Cache::remember('site_banners', 3600, fn() =>
+                \App\Models\Banner::active()
                     ->orderBy('sort_order')
                     ->orderBy('id')
                     ->get()
-                    ->groupBy('position');
-            }
+                    ->map(fn($b) => $b->toArray())
+                    ->all()
+            );
+            $bannersByPos = collect($bannersArr)
+                ->map(fn($b) => (object) $b)
+                ->groupBy('position')
+                ->map(fn($g) => $g->values());
 
-            static $navMenus = null;
-            if ($navMenus === null) {
-                $navMenus = \App\Models\NavigationMenu::active()
+            $navArr = \Illuminate\Support\Facades\Cache::remember('site_navmenus', 3600, fn() =>
+                \App\Models\NavigationMenu::active()
                     ->with(['children' => fn($q) => $q->active()->orderBy('sort_order')
                         ->with(['children' => fn($q2) => $q2->active()->orderBy('sort_order')
                             ->with(['children' => fn($q3) => $q3->active()->orderBy('sort_order')])
@@ -57,8 +58,20 @@ class AppServiceProvider extends ServiceProvider
                     ])
                     ->whereNull('parent_id')
                     ->orderBy('sort_order')
-                    ->get();
-            }
+                    ->get()
+                    ->toArray()
+            );
+            $toCollection = null;
+            $toCollection = function (array $items) use (&$toCollection): \Illuminate\Support\Collection {
+                return collect($items)->map(function ($item) use (&$toCollection) {
+                    $obj = (object) $item;
+                    $obj->children = isset($item['children']) && is_array($item['children'])
+                        ? $toCollection($item['children'])
+                        : collect();
+                    return $obj;
+                });
+            };
+            $navMenus = $toCollection($navArr);
 
             $view->with('settings', $settings)
                  ->with('locale', app()->getLocale())

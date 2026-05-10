@@ -9,15 +9,15 @@
   <link rel="icon" type="image/x-icon" href="{{ $settings->favicon_url }}" />
   @endif
 
-  {{-- Google Fonts (Lao serif) --}}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Noto+Serif+Lao:wdth,wght@100,300..900&display=swap" />
-
-  {{-- Font Awesome --}}
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  {{-- Font Awesome: preload + async load to avoid render-blocking --}}
+  <link rel="preload"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  </noscript>
 
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @stack('styles')

@@ -10,40 +10,43 @@ use App\Models\MonkExchangeProgram;
 use App\Models\MouAgreement;
 use App\Models\News;
 use App\Models\PartnerOrganization;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
     public function index()
     {
-        return response()->json([
-            'totals' => [
-                'news'      => News::count(),
-                'events'    => Event::count(),
-                'partners'  => PartnerOrganization::count(),
-                'mou'       => MouAgreement::count(),
-                'committee' => CommitteeMember::count(),
-                'monk'      => MonkExchangeProgram::count(),
-                'aid'       => AidProject::count(),
-            ],
-            'news_monthly_12m' => $this->monthlyCount(News::class),
-            'events_monthly_12m' => $this->monthlyCount(Event::class),
-            'partners_by_type' => PartnerOrganization::select('type', DB::raw('count(*) as total'))
-                ->whereNotNull('type')
-                ->groupBy('type')
-                ->get(),
-            'mou_by_status' => MouAgreement::select('status', DB::raw('count(*) as total'))
-                ->groupBy('status')
-                ->get(),
-            'aid_by_status' => AidProject::select('status', DB::raw('count(*) as total'))
-                ->groupBy('status')
-                ->get(),
-            'monk_by_year' => MonkExchangeProgram::select('year', DB::raw('count(*) as total'))
-                ->whereNotNull('year')
-                ->groupBy('year')
-                ->orderBy('year')
-                ->get(),
-        ]);
+        // Cache stats for 10 minutes — aggregate queries are expensive
+        $data = Cache::remember('api_statistics', 600, function () {
+            // 7 COUNT queries → 1 batched query
+            $totals = DB::selectOne('
+                SELECT
+                  (SELECT COUNT(*) FROM news) AS news,
+                  (SELECT COUNT(*) FROM events) AS events,
+                  (SELECT COUNT(*) FROM partner_organizations) AS partners,
+                  (SELECT COUNT(*) FROM mou_agreements) AS mou,
+                  (SELECT COUNT(*) FROM committee_members) AS committee,
+                  (SELECT COUNT(*) FROM monk_exchange_programs) AS monk,
+                  (SELECT COUNT(*) FROM aid_projects) AS aid
+            ');
+
+            return [
+                'totals'             => (array) $totals,
+                'news_monthly_12m'   => $this->monthlyCount(News::class),
+                'events_monthly_12m' => $this->monthlyCount(Event::class),
+                'partners_by_type'   => PartnerOrganization::select('type', DB::raw('count(*) as total'))
+                    ->whereNotNull('type')->groupBy('type')->get()->toArray(),
+                'mou_by_status'      => MouAgreement::select('status', DB::raw('count(*) as total'))
+                    ->groupBy('status')->get()->toArray(),
+                'aid_by_status'      => AidProject::select('status', DB::raw('count(*) as total'))
+                    ->groupBy('status')->get()->toArray(),
+                'monk_by_year'       => MonkExchangeProgram::select('year', DB::raw('count(*) as total'))
+                    ->whereNotNull('year')->groupBy('year')->orderBy('year')->get()->toArray(),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     private function monthlyCount(string $model): array

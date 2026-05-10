@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Services\CacheInvalidator;
 use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -72,6 +73,7 @@ class NewsController extends Controller
 
         $news = News::create($data);
         $news->tags()->sync($request->input('tag_ids', []));
+        CacheInvalidator::news();
 
         return response()->json($this->format($news->fresh(['category', 'author', 'tags'])), 201);
     }
@@ -120,6 +122,7 @@ class NewsController extends Controller
 
         $news->update($data);
         $news->tags()->sync($request->input('tag_ids', []));
+        CacheInvalidator::news();
 
         return response()->json($this->format($news->fresh(['category', 'author', 'tags'])));
     }
@@ -130,6 +133,7 @@ class NewsController extends Controller
             Storage::disk('public')->delete($news->thumbnail);
         }
         $news->delete();
+        CacheInvalidator::news();
 
         return response()->json(['message' => 'ລຶບຂ່າວສຳເລັດ']);
     }
@@ -138,6 +142,7 @@ class NewsController extends Controller
     {
         $request->validate(['status' => ['required', Rule::in(['draft', 'published', 'archived'])]]);
         $news->update(['status' => $request->status]);
+        CacheInvalidator::news();
 
         return response()->json(['message' => 'ອັບເດດສຳເລັດ', 'status' => $news->status]);
     }

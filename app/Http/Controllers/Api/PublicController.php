@@ -14,35 +14,40 @@ use App\Models\PartnerOrganization;
 use App\Models\SiteSetting;
 use App\Models\SiteStatistic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PublicController extends Controller
 {
     public function slides()
     {
-        $slides = HeroSlide::active()->get()->map(fn($s) => [
-            'id'           => $s->id,
-            'tag'          => $s->tag_lo,
-            'title'        => $s->title_lo,
-            'subtitle'     => $s->subtitle_lo,
-            'image_url'    => $s->image_url,
-            'btn1_text'    => $s->btn1_text_lo,
-            'btn1_url'     => $s->btn1_url,
-            'btn2_text'    => $s->btn2_text_lo,
-            'btn2_url'     => $s->btn2_url,
-        ]);
+        $slides = Cache::remember('api_slides', 1800, fn() =>
+            HeroSlide::active()->get()->map(fn($s) => [
+                'id'        => $s->id,
+                'tag'       => $s->tag_lo,
+                'title'     => $s->title_lo,
+                'subtitle'  => $s->subtitle_lo,
+                'image_url' => $s->image_url,
+                'btn1_text' => $s->btn1_text_lo,
+                'btn1_url'  => $s->btn1_url,
+                'btn2_text' => $s->btn2_text_lo,
+                'btn2_url'  => $s->btn2_url,
+            ])->all()
+        );
 
         return response()->json($slides);
     }
 
     public function stats()
     {
-        $stats = SiteStatistic::active()->get()->map(fn($s) => [
-            'id'     => $s->id,
-            'label'  => $s->label_lo,
-            'value'  => (int) $s->value,
-            'icon'   => $s->icon,
-            'suffix' => $s->suffix,
-        ]);
+        $stats = Cache::remember('api_stats', 1800, fn() =>
+            SiteStatistic::active()->get()->map(fn($s) => [
+                'id'     => $s->id,
+                'label'  => $s->label_lo,
+                'value'  => (int) $s->value,
+                'icon'   => $s->icon,
+                'suffix' => $s->suffix,
+            ])->all()
+        );
 
         return response()->json($stats);
     }
@@ -113,68 +118,120 @@ class PublicController extends Controller
 
     public function partners()
     {
-        $partners = PartnerOrganization::active()
-            ->orderBy('sort_order')
-            ->get()
-            ->map(fn($p) => [
-                'id'       => $p->id,
-                'name'     => $p->name_lo ?: $p->name_en,
-                'acronym'  => $p->acronym,
-                'logo_url' => $p->logo_url,
-                'website'  => $p->website_url,
-                'country'  => $p->country_name_lo ?: $p->country_name_en,
-            ]);
+        $partners = Cache::remember('api_partners', 1800, fn() =>
+            PartnerOrganization::active()
+                ->orderBy('sort_order')
+                ->get(['id','name_lo','name_en','acronym','logo_url','website_url','country_name_lo','country_name_en'])
+                ->map(fn($p) => [
+                    'id'       => $p->id,
+                    'name'     => $p->name_lo ?: $p->name_en,
+                    'acronym'  => $p->acronym,
+                    'logo_url' => $p->logo_url,
+                    'website'  => $p->website_url,
+                    'country'  => $p->country_name_lo ?: $p->country_name_en,
+                ])->all()
+        );
 
         return response()->json($partners);
     }
 
     public function home()
     {
+        // Slides + stats: long cache (rarely change)
+        $slides  = Cache::remember('api_slides', 1800, fn() =>
+            HeroSlide::active()->get()->map(fn($s) => [
+                'id'        => $s->id,
+                'tag'       => $s->tag_lo,
+                'title'     => $s->title_lo,
+                'subtitle'  => $s->subtitle_lo,
+                'image_url' => $s->image_url,
+                'btn1_text' => $s->btn1_text_lo,
+                'btn1_url'  => $s->btn1_url,
+                'btn2_text' => $s->btn2_text_lo,
+                'btn2_url'  => $s->btn2_url,
+            ])->all()
+        );
+
+        $stats = Cache::remember('api_stats', 1800, fn() =>
+            SiteStatistic::active()->get()->map(fn($s) => [
+                'id'     => $s->id,
+                'label'  => $s->label_lo,
+                'value'  => (int) $s->value,
+                'icon'   => $s->icon,
+                'suffix' => $s->suffix,
+            ])->all()
+        );
+
+        // Partners: long cache, select only needed columns
+        $partners = Cache::remember('api_home_partners', 1800, fn() =>
+            PartnerOrganization::active()
+                ->orderBy('sort_order')
+                ->get(['id','name_lo','name_en','acronym','logo_url'])
+                ->map(fn($p) => ['id' => $p->id, 'name' => $p->name_lo ?: $p->name_en, 'acronym' => $p->acronym, 'logo_url' => $p->logo_url])
+                ->all()
+        );
+
+        // News: short cache (5 min) since it changes frequently
+        $featuredNews = Cache::remember('api_home_featured_news', 300, fn() =>
+            News::select('id','title_lo','title_en','title_zh','excerpt_lo','excerpt_en','excerpt_zh','thumbnail','category_id','published_at','is_urgent','slug')
+                ->with(['category:id,name_lo'])
+                ->published()->featured()->latest('published_at')->limit(4)->get()
+                ->map(fn($n) => [
+                    'id'          => $n->id,
+                    'title_lo'    => $n->title_lo,
+                    'title_en'    => $n->title_en,
+                    'title_zh'    => $n->title_zh,
+                    'excerpt_lo'  => $n->excerpt_lo,
+                    'excerpt_en'  => $n->excerpt_en,
+                    'excerpt_zh'  => $n->excerpt_zh,
+                    'thumbnail'   => $n->thumbnail ? asset('storage/' . $n->thumbnail) : null,
+                    'category'    => $n->category?->name_lo,
+                    'published_at'=> $n->published_at?->format('d/m/Y'),
+                    'is_urgent'   => $n->is_urgent,
+                    'slug'        => $n->slug,
+                ])->all()
+        );
+
+        $latestNews = Cache::remember('api_home_latest_news', 300, fn() =>
+            News::select('id','title_lo','title_en','title_zh','thumbnail','category_id','published_at','slug')
+                ->with(['category:id,name_lo'])
+                ->published()->latest('published_at')->limit(4)->get()
+                ->map(fn($n) => [
+                    'id'          => $n->id,
+                    'title_lo'    => $n->title_lo,
+                    'title_en'    => $n->title_en,
+                    'title_zh'    => $n->title_zh,
+                    'thumbnail'   => $n->thumbnail ? asset('storage/' . $n->thumbnail) : null,
+                    'category'    => $n->category?->name_lo,
+                    'published_at'=> $n->published_at?->format('d/m/Y'),
+                    'slug'        => $n->slug,
+                ])->all()
+        );
+
+        $upcomingEvents = Cache::remember('api_home_upcoming_events', 300, fn() =>
+            Event::select('id','title_lo','title_en','title_zh','thumbnail','start_date','location_lo','location_en','slug')
+                ->where('status', 'upcoming')
+                ->latest('start_date')->limit(3)->get()
+                ->map(fn($e) => [
+                    'id'          => $e->id,
+                    'title_lo'    => $e->title_lo,
+                    'title_en'    => $e->title_en,
+                    'title_zh'    => $e->title_zh,
+                    'thumbnail'   => $e->thumbnail ? asset('storage/' . $e->thumbnail) : null,
+                    'start_date'  => $e->start_date?->format('d/m/Y'),
+                    'location_lo' => $e->location_lo,
+                    'location_en' => $e->location_en,
+                    'slug'        => $e->slug,
+                ])->all()
+        );
+
         return response()->json([
-            'slides'          => $this->slides()->original,
-            'stats'           => $this->stats()->original,
-            'featured_news'   => News::with('category')->published()->featured()->latest('published_at')->limit(4)->get()->map(fn($n) => [
-                'id'          => $n->id,
-                'title_lo'    => $n->title_lo,
-                'title_en'    => $n->title_en,
-                'title_zh'    => $n->title_zh,
-                'excerpt_lo'  => $n->excerpt_lo,
-                'excerpt_en'  => $n->excerpt_en,
-                'excerpt_zh'  => $n->excerpt_zh,
-                'thumbnail'   => $n->thumbnail ? asset('storage/' . $n->thumbnail) : null,
-                'category'    => $n->category?->name_lo,
-                'published_at'=> $n->published_at?->format('d/m/Y'),
-                'is_urgent'   => $n->is_urgent,
-                'slug'        => $n->slug,
-            ]),
-            'latest_news'     => News::with('category')->published()->latest('published_at')->limit(4)->get()->map(fn($n) => [
-                'id'          => $n->id,
-                'title_lo'    => $n->title_lo,
-                'title_en'    => $n->title_en,
-                'title_zh'    => $n->title_zh,
-                'thumbnail'   => $n->thumbnail ? asset('storage/' . $n->thumbnail) : null,
-                'category'    => $n->category?->name_lo,
-                'published_at'=> $n->published_at?->format('d/m/Y'),
-                'slug'        => $n->slug,
-            ]),
-            'upcoming_events' => Event::where('status', 'upcoming')
-                ->latest('start_date')->limit(3)->get()->map(fn($e) => [
-                    'id'         => $e->id,
-                    'title_lo'   => $e->title_lo,
-                    'title_en'   => $e->title_en,
-                    'title_zh'   => $e->title_zh,
-                    'thumbnail'  => $e->thumbnail ? asset('storage/' . $e->thumbnail) : null,
-                    'start_date' => $e->start_date?->format('d/m/Y'),
-                    'location_lo'=> $e->location_lo,
-                    'location_en'=> $e->location_en,
-                    'slug'       => $e->slug,
-                ]),
-            'partners'        => PartnerOrganization::active()->orderBy('sort_order')->get()->map(fn($p) => [
-                'id'      => $p->id,
-                'name'    => $p->name_lo ?: $p->name_en,
-                'acronym' => $p->acronym,
-                'logo_url'=> $p->logo_url,
-            ]),
+            'slides'          => $slides,
+            'stats'           => $stats,
+            'featured_news'   => $featuredNews,
+            'latest_news'     => $latestNews,
+            'upcoming_events' => $upcomingEvents,
+            'partners'        => $partners,
         ]);
     }
 
@@ -198,8 +255,9 @@ class PublicController extends Controller
 
     public function settings()
     {
-        $rows = SiteSetting::all(['key', 'value']);
-        $map  = $rows->pluck('value', 'key');
+        $map = Cache::remember('api_site_settings', 3600, fn() =>
+            SiteSetting::all(['key', 'value'])->pluck('value', 'key')->all()
+        );
 
         return response()->json([
             'site_name_lo'   => $map['site_name_lo']   ?? 'ອົງສ · BFOL',

@@ -15,4 +15,20 @@ export default defineConfig({
             ignored: ['**/storage/framework/views/**'],
         },
     },
+    build: {
+        chunkSizeWarningLimit: 500,
+        cssMinify: true,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules/alpinejs') || id.includes('node_modules/@alpinejs')) {
+                        return 'alpine';
+                    }
+                    if (id.includes('node_modules/@fontsource')) {
+                        return 'fonts';
+                    }
+                },
+            },
+        },
+    },
 });
