@@ -1,6 +1,6 @@
 # BFOL — Buddhist Foreign Affairs of Laos CMS
 
-ລະບົບ Content Management System (CMS) ສຳລັບ **ກົມກັມມາທິການຕ່າງປະເທດຂອງພຸດທະສາສະໜາລາວ** ພັດທະນາດ້ວຍ Laravel 11 + React/Vite ຮອງຮັບ 3 ພາສາ (ລາວ, ອັງກິດ, ຈີນ) ພ້ອມ Admin Panel ສຳລັບຈັດການເນື້ອຫາທຸກໝວດໝູ່, ລະບົບ API, ກາຟ ແລະ ສົ່ງອອກ PDF.
+ລະບົບ Content Management System (CMS) ສຳລັບ **ກັມມາທິການການຕ່າງປະເທດ ສູນກາງ ອພສ** ພັດທະນາດ້ວຍ Laravel 11 + React/Vite ຮອງຮັບ 3 ພາສາ (ລາວ, ອັງກິດ, ຈີນ) ພ້ອມ Admin Panel ສຳລັບຈັດການເນື້ອຫາທຸກໝວດໝູ່, ລະບົບ API, ກາຟ ແລະ ສົ່ງອອກ PDF.
 
 ---
 
@@ -415,3 +415,13 @@ bfol/
 - **PDF**: `mPDF` ທີ່ backend — frontend ດາວໂຫຼດ blob response
 - **contact_messages**: `timestamps = false` — ມີພຽງ `created_at` (ບໍ່ມີ `updated_at`)
 - **MOU constraint**: `partner_org_id` ໃຊ້ `RESTRICT` — ລຶບ Partner ທີ່ຜູກ MOU ຢູ່ບໍ່ໄດ້
+
+---
+
+## ຜູ້ພັດທະນາລະບົບ (Developer)
+
+| ຊ່ອງທາງ | ລາຍລະອຽດ |
+|---|---|
+| Facebook | [facebook.com/phathasira](https://www.facebook.com/phathasira) |
+| ໂທລະສັບ | [020 7777 2338](tel:02077772338) |
+| WhatsApp | [020 9121 3388](https://wa.me/85620091213388) |
