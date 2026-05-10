@@ -2,6 +2,7 @@
 
 @section('page_title', 'ສ້າງໜ້າຂໍ້ມູນໃໝ່')
 
+
 @section('content')
 <div class="max-w-4xl mx-auto">
 
@@ -96,21 +97,15 @@
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ລາວ)</label>
-          <textarea name="content_lo" rows="8"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono"
-                    placeholder="ເນື້ອໃນໜ້າ...">{{ old('content_lo') }}</textarea>
+          <textarea name="content_lo" id="page-editor-lo">{{ old('content_lo') }}</textarea>
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ອັງກິດ)</label>
-          <textarea name="content_en" rows="6"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono"
-                    placeholder="Page content...">{{ old('content_en') }}</textarea>
+          <textarea name="content_en" id="page-editor-en">{{ old('content_en') }}</textarea>
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ຈີນ)</label>
-          <textarea name="content_zh" rows="6"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono"
-                    placeholder="页面内容...">{{ old('content_zh') }}</textarea>
+          <textarea name="content_zh" id="page-editor-zh">{{ old('content_zh') }}</textarea>
         </div>
       </div>
     </div>
@@ -190,27 +185,48 @@
 @endsection
 
 @push('scripts')
-<script>
-  // Auto-generate slug from title_lo
-  const titleInput = document.getElementById('title_lo');
-  const slugInput  = document.getElementById('slug');
-  titleInput.addEventListener('input', function () {
-    if (slugInput.dataset.manual) return;
-    slugInput.value = this.value
-      .toLowerCase()
-      .replace(/[^a-z0-9\s\-]/g, '')
-      .trim()
-      .replace(/\s+/g, '-');
-  });
-  slugInput.addEventListener('input', function () {
-    this.dataset.manual = this.value ? '1' : '';
-  });
 
-  // Meta description counter
-  const metaDesc  = document.querySelector('[name="meta_description"]');
-  const metaCount = document.getElementById('meta-count');
-  function updateCount() { metaCount.textContent = metaDesc.value.length + ' / 500'; }
-  metaDesc.addEventListener('input', updateCount);
-  updateCount();
+@include('admin.partials.tinymce-init', [
+    'tinyEditors' => [
+        ['id' => 'page-editor-lo', 'placeholder' => 'ຂຽນເນື້ອຫາທີ່ນີ້…'],
+        ['id' => 'page-editor-en', 'placeholder' => 'Write page content here…'],
+        ['id' => 'page-editor-zh', 'placeholder' => '在此写页面内容…'],
+    ],
+    'tinyUploadUrl' => route('admin.editor.upload'),
+    'tinyHeight'    => 460,
+    'tinyDraftKey'  => 'page-create-',
+])
+
+<script>
+  /* Auto-generate slug from title_lo */
+  (function () {
+    var titleInput = document.getElementById('title_lo');
+    var slugInput  = document.getElementById('slug');
+    if (!titleInput || !slugInput) return;
+    titleInput.addEventListener('input', function () {
+      if (slugInput.dataset.manual) return;
+      slugInput.value = this.value.toLowerCase()
+        .replace(/[^a-z0-9\s\-]/g, '').trim().replace(/\s+/g, '-');
+    });
+    slugInput.addEventListener('input', function () {
+      this.dataset.manual = this.value ? '1' : '';
+    });
+  })();
+
+  /* Meta description character counter */
+  (function () {
+    var metaDesc  = document.querySelector('[name="meta_description"]');
+    var metaCount = document.getElementById('meta-count');
+    if (!metaDesc || !metaCount) return;
+    function upd() { metaCount.textContent = metaDesc.value.length + ' / 500'; }
+    metaDesc.addEventListener('input', upd);
+    upd();
+  })();
+
+  /* Sync TinyMCE to textareas before submit */
+  document.querySelector('form').addEventListener('submit', function () {
+    window.syncTinyMCE();
+  });
 </script>
+
 @endpush

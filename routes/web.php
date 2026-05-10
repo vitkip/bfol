@@ -38,6 +38,7 @@ use App\Http\Controllers\Front\PhotoAlbumController as FrontAlbum;
 use App\Http\Controllers\Front\TranslationProjectController as FrontTranslation;
 use App\Http\Controllers\Admin\PhotoAlbumController as AdminAlbum;
 use App\Http\Controllers\Admin\TranslationController as AdminTranslation;
+use App\Http\Controllers\Admin\EditorUploadController;
 use Illuminate\Support\Facades\Route;
 
 // ─── ADMIN AUTH (no locale prefix) ───────────────────────────────────────────
@@ -53,6 +54,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
 
     // Dashboard — all roles
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Editor endpoints — throttled to prevent upload/autosave abuse
+    Route::post('editor/upload',   [EditorUploadController::class, 'store'])->middleware('throttle:30,1')->name('editor.upload');
+    Route::post('editor/autosave', [EditorUploadController::class, 'autosave'])->middleware('throttle:60,1')->name('editor.autosave');
+    Route::get('editor/draft',     [EditorUploadController::class, 'getDraft'])->middleware('throttle:60,1')->name('editor.draft');
 
     // ── CONTENT (editor, admin, superadmin can write; viewer read-only) ──────
     Route::resource('news',          AdminNews::class);

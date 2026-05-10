@@ -2,6 +2,7 @@
 
 @section('page_title', 'ແກ້ໄຂໜ້າຂໍ້ມູນ')
 
+
 @section('content')
 <div class="max-w-4xl mx-auto">
 
@@ -98,18 +99,15 @@
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ລາວ)</label>
-          <textarea name="content_lo" rows="8"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono">{{ old('content_lo', $page->content_lo) }}</textarea>
+          <textarea name="content_lo" id="page-editor-lo">{{ old('content_lo', $page->content_lo) }}</textarea>
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ອັງກິດ)</label>
-          <textarea name="content_en" rows="6"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono">{{ old('content_en', $page->content_en) }}</textarea>
+          <textarea name="content_en" id="page-editor-en">{{ old('content_en', $page->content_en) }}</textarea>
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">ເນື້ອໃນ (ຈີນ)</label>
-          <textarea name="content_zh" rows="6"
-                    class="w-full rounded-lg border border-surface-container-high px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono">{{ old('content_zh', $page->content_zh) }}</textarea>
+          <textarea name="content_zh" id="page-editor-zh">{{ old('content_zh', $page->content_zh) }}</textarea>
         </div>
       </div>
     </div>
@@ -198,11 +196,33 @@
 @endsection
 
 @push('scripts')
+
+@include('admin.partials.tinymce-init', [
+    'tinyEditors' => [
+        ['id' => 'page-editor-lo', 'placeholder' => 'ຂຽນເນື້ອຫາທີ່ນີ້…'],
+        ['id' => 'page-editor-en', 'placeholder' => 'Write page content here…'],
+        ['id' => 'page-editor-zh', 'placeholder' => '在此写页面内容…'],
+    ],
+    'tinyUploadUrl' => route('admin.editor.upload'),
+    'tinyHeight'    => 460,
+    'tinyDraftKey'  => 'page-edit-' . $page->id . '-',
+])
+
 <script>
-  const metaDesc  = document.querySelector('[name="meta_description"]');
-  const metaCount = document.getElementById('meta-count');
-  function updateCount() { metaCount.textContent = metaDesc.value.length + ' / 500'; }
-  metaDesc.addEventListener('input', updateCount);
-  updateCount();
+  /* Meta description character counter */
+  (function () {
+    var metaDesc  = document.querySelector('[name="meta_description"]');
+    var metaCount = document.getElementById('meta-count');
+    if (!metaDesc || !metaCount) return;
+    function upd() { metaCount.textContent = metaDesc.value.length + ' / 500'; }
+    metaDesc.addEventListener('input', upd);
+    upd();
+  })();
+
+  /* Sync TinyMCE to textareas before submit */
+  document.querySelector('form').addEventListener('submit', function () {
+    window.syncTinyMCE();
+  });
 </script>
+
 @endpush

@@ -2,16 +2,6 @@
 
 @section('page_title', $news->exists ? 'ແກ້ໄຂຂ່າວ' : 'ສ້າງຂ່າວໃໝ່')
 
-@push('styles')
-<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" />
-<style>
-  .ql-container { font-family: 'Phetsarath OT', Inter, sans-serif; font-size: 14px; }
-  .ql-editor { min-height: 280px; }
-  .ql-toolbar { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; background: #f3f3f4; border-color: #e8e8e9 !important; }
-  .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-color: #e8e8e9 !important; }
-  .ql-editor.ql-blank::before { font-style: normal; color: #727783; }
-</style>
-@endpush
 
 @section('content')
 
@@ -19,7 +9,7 @@
       action="{{ $news->exists ? route('admin.news.update', $news) : route('admin.news.store') }}"
       enctype="multipart/form-data"
       x-data="newsForm()"
-      @submit="syncEditors">
+      @submit.prevent="syncAndSubmit($el)">
   @csrf
   @if($news->exists) @method('PUT') @endif
 
@@ -78,8 +68,7 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">ເນື້ອຫາ (ລາວ) <span class="text-red-500">*</span></label>
-                <div id="editor-lo" class="rounded-lg">{{ old('content_lo', $news->content_lo) }}</div>
-                <input type="hidden" name="content_lo" id="content_lo" value="{{ old('content_lo', $news->content_lo) }}" />
+                <textarea name="content_lo" id="editor-lo">{{ old('content_lo', $news->content_lo) }}</textarea>
                 @error('content_lo')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
               </div>
             </div>
@@ -101,8 +90,7 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Content (English)</label>
-                <div id="editor-en" class="rounded-lg">{{ old('content_en', $news->content_en) }}</div>
-                <input type="hidden" name="content_en" id="content_en" value="{{ old('content_en', $news->content_en) }}" />
+                <textarea name="content_en" id="editor-en">{{ old('content_en', $news->content_en) }}</textarea>
               </div>
             </div>
           </div>
@@ -123,8 +111,7 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">内容 (中文)</label>
-                <div id="editor-zh" class="rounded-lg">{{ old('content_zh', $news->content_zh) }}</div>
-                <input type="hidden" name="content_zh" id="content_zh" value="{{ old('content_zh', $news->content_zh) }}" />
+                <textarea name="content_zh" id="editor-zh">{{ old('content_zh', $news->content_zh) }}</textarea>
               </div>
             </div>
           </div>
@@ -292,41 +279,35 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+@include('admin.partials.tinymce-init', [
+    'tinyEditors' => [
+        ['id' => 'editor-lo', 'placeholder' => 'ຂຽນເນື້ອຫາທີ່ນີ້…'],
+        ['id' => 'editor-en', 'placeholder' => 'Write content here…'],
+        ['id' => 'editor-zh', 'placeholder' => '在此写内容…'],
+    ],
+    'tinyUploadUrl' => route('admin.editor.upload'),
+    'tinyHeight'    => 460,
+    'tinyDraftKey'  => 'news-',
+])
+
 <script>
-  const toolbarOptions = [
-    [{ header: [2, 3, false] }],
-    ['bold', 'italic', 'underline'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['blockquote', 'link', 'image'],
-    ['clean'],
-  ];
-
-  const editors = {};
-  ['lo', 'en', 'zh'].forEach(lang => {
-    editors[lang] = new Quill('#editor-' + lang, {
-      theme: 'snow',
-      modules: { toolbar: toolbarOptions },
-      placeholder: lang === 'lo' ? 'ຂຽນເນື້ອຫາທີ່ນີ້…' : (lang === 'en' ? 'Write content here…' : '在此写内容…'),
-    });
-    // Set initial HTML
-    const initial = document.getElementById('content_' + lang).value;
-    if (initial) editors[lang].root.innerHTML = initial;
-  });
-
   function newsForm() {
     return {
       tab: 'lo',
       changeTab(lang) {
         this.tab = lang;
-        this.$nextTick(() => editors[lang]?.update());
-      },
-      syncEditors() {
-        ['lo', 'en', 'zh'].forEach(lang => {
-          document.getElementById('content_' + lang).value = editors[lang].root.innerHTML;
+        this.$nextTick(function () {
+          window.dispatchEvent(new Event('resize'));
+          window.refreshTinyMCE('editor-' + lang);
         });
-      }
+      },
+      syncAndSubmit(form) {
+        window.syncTinyMCE();
+        form.submit();
+      },
     };
   }
 </script>
+
 @endpush
