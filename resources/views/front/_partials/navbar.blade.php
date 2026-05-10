@@ -9,7 +9,7 @@
     default => $m->label_lo,
   };
 
-  $isExternal = fn($m) => $m->target === '_blank' || str_starts_with((string)$m->url, 'http');
+  $isExternal = fn($m) => $m->target === '_blank' || ($m->target !== '_self' && str_starts_with((string)$m->url, 'http'));
 
   // Recursive tree builder — keys: label, icon, url, external, children[]
   $buildTree = null;
