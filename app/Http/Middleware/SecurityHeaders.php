@@ -177,6 +177,10 @@ class SecurityHeaders
                 ? "'self' blob: {$devConnect}"
                 : "'self' blob:";
 
+            $formAction = app()->isLocal()
+                ? "'self' {$devHosts}"
+                : "'self'";
+
             $directives = [
                 "default-src 'self'",
                 "script-src {$scriptSrc}",
@@ -189,7 +193,7 @@ class SecurityHeaders
                 "connect-src {$connectSrc}",
                 "object-src 'none'",
                 "base-uri 'self'",
-                "form-action 'self'",
+                "form-action {$formAction}",
                 "frame-ancestors 'self'",  // supersedes X-Frame-Options in modern browsers
             ];
 

@@ -288,7 +288,7 @@
     ],
     'tinyUploadUrl' => route('admin.editor.upload'),
     'tinyHeight'    => 460,
-    'tinyDraftKey'  => 'news-',
+    'tinyDraftKey'  => $news->exists ? 'news-edit-' . $news->id . '-' : 'news-create-',
 ])
 
 <script>

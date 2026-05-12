@@ -73,12 +73,7 @@ class PageController extends Controller
         return redirect()->route('admin.pages.index')->with('success', 'ສ້າງໜ້າຂໍ້ມູນສຳເລັດແລ້ວ');
     }
 
-    public function show(Page $page)
-    {
-        return view('admin.pages.show', compact('page'));
-    }
-
-    public function edit(Page $page)
+public function edit(Page $page)
     {
         $parentPages = Page::where('slug', '!=', $page->slug)
                            ->select('slug', 'title_lo')

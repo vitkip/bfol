@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\News;
 use App\Models\Tag;
+use App\Services\CacheInvalidator;
 use App\Services\HtmlPurifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -93,6 +94,7 @@ class NewsController extends Controller
 
         $news = News::create($data);
         $news->tags()->sync($request->input('tag_ids', []));
+        CacheInvalidator::news();
 
         return redirect()->route('admin.news.index')->with('success', 'ສ້າງຂ່າວສໍາເລັດແລ້ວ');
     }
@@ -152,6 +154,7 @@ class NewsController extends Controller
 
         $news->update($data);
         $news->tags()->sync($request->input('tag_ids', []));
+        CacheInvalidator::news();
 
         return redirect()->route('admin.news.index')->with('success', 'ອັບເດດຂ່າວສໍາເລັດແລ້ວ');
     }
@@ -163,6 +166,7 @@ class NewsController extends Controller
         }
 
         $news->delete();
+        CacheInvalidator::news();
 
         return redirect()->route('admin.news.index')->with('success', 'ລົບຂ່າວສໍາເລັດແລ້ວ');
     }

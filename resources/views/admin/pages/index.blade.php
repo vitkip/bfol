@@ -85,11 +85,7 @@
           </td>
           <td class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-2">
-              <a href="{{ route('admin.pages.show', $page) }}"
-                 class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline">
-                <i class="fas fa-eye"></i><span class="hidden sm:inline">ລາຍລະອຽດ</span>
-              </a>
-              <a href="{{ route('admin.pages.edit', $page) }}"
+<a href="{{ route('admin.pages.edit', $page) }}"
                  class="inline-flex items-center gap-1 text-xs font-semibold text-yellow-600 hover:underline">
                 <i class="fas fa-edit"></i><span class="hidden sm:inline">ແກ້ໄຂ</span>
               </a>

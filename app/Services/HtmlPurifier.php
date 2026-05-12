@@ -114,7 +114,7 @@ class HtmlPurifier
         $config->set('URI.SafeIframeRegexp', self::SAFE_IFRAME_REGEXP);
 
         /* ── CSS ─────────────────────────────────────────────────────── */
-        $config->set('CSS.AllowedProperties', implode(',', self::ALLOWED_CSS));
+        // CSS.AllowedProperties is set at the bottom after custom properties are registered
 
         /* ── Auto-format ─────────────────────────────────────────────── */
         $config->set('AutoFormat.AutoParagraph', false);
@@ -122,8 +122,8 @@ class HtmlPurifier
         $config->set('Output.TidyFormat', false);
 
         /* ── Definition cache — bump DefinitionRev on any schema change ─ */
-        $config->set('HTML.DefinitionID',  'bfol-cms-v5');
-        $config->set('HTML.DefinitionRev', 5);
+        $config->set('HTML.DefinitionID',  'bfol-cms-v6');
+        $config->set('HTML.DefinitionRev', 6);
 
         /* ── Serializer cache ────────────────────────────────────────── */
         $cacheDir = storage_path('framework/cache/htmlpurifier');
@@ -190,6 +190,27 @@ class HtmlPurifier
                 new \HTMLPurifier_AttrDef_Text());
             $def->addAttribute('iframe', 'loading',
                 new \HTMLPurifier_AttrDef_Enum(['lazy', 'eager', 'auto'], false));
+        }
+
+        /* ── CSS properties not known to older HTMLPurifier builds ──────── */
+        // word-break / word-wrap are CSS3 properties absent from HTMLPurifier's
+        // HTML4-era CSS definition.
+        $cssDef = $config->getCSSDefinition();
+        $cssDef->info['word-break'] = new \HTMLPurifier_AttrDef_Enum(
+            ['normal', 'break-all', 'break-word', 'keep-all'], false
+        );
+        $cssDef->info['word-wrap'] = new \HTMLPurifier_AttrDef_Enum(
+            ['normal', 'break-word', 'anywhere'], false
+        );
+
+        /* ── CSS Filtering ─────────────────────────────────────────────── */
+        // Instead of setting CSS.AllowedProperties (which throws an ErrorException
+        // if properties are not recognized in the base definition), we manually
+        // unset any property not in our curated ALLOWED_CSS list.
+        foreach (array_keys($cssDef->info) as $key) {
+            if (!in_array($key, self::ALLOWED_CSS, true)) {
+                unset($cssDef->info[$key]);
+            }
         }
 
         self::$instance = new \HTMLPurifier($config);

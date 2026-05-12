@@ -64,7 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.role'])->grou
     Route::resource('news',          AdminNews::class);
     Route::resource('events',        AdminEvent::class);
     Route::resource('event_tags',    \App\Http\Controllers\Admin\EventTagController::class);
-    Route::resource('pages',         AdminPage::class);
+    Route::resource('pages',         AdminPage::class)->except(['show']);
     Route::resource('media',         AdminMedia::class);
     Route::resource('documents',     AdminDocument::class);
     Route::get('documents/{document}/download', [AdminDocument::class, 'download'])->name('documents.download');

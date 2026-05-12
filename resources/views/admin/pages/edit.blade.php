@@ -10,7 +10,7 @@
   <div class="flex items-center gap-2 text-xs text-outline mb-4">
     <a href="{{ route('admin.pages.index') }}" class="hover:text-primary transition-colors">ໜ້າຂໍ້ມູນ</a>
     <i class="fas fa-chevron-right text-[10px]"></i>
-    <a href="{{ route('admin.pages.show', $page) }}" class="hover:text-primary transition-colors truncate max-w-[200px]">{{ $page->title_lo }}</a>
+    <span class="truncate max-w-[200px] text-on-surface-variant">{{ $page->title_lo }}</span>
     <i class="fas fa-chevron-right text-[10px]"></i>
     <span>ແກ້ໄຂ</span>
   </div>
@@ -185,7 +185,7 @@
               class="inline-flex items-center gap-2 primary-gradient text-white font-semibold px-6 py-2.5 rounded-lg hover:opacity-90 transition text-sm">
         <i class="fas fa-save text-xs"></i> ບັນທຶກການປ່ຽນແປງ
       </button>
-      <a href="{{ route('admin.pages.show', $page) }}"
+      <a href="{{ route('admin.pages.index') }}"
          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-surface-container-high text-on-surface-variant hover:bg-surface-container transition text-sm">
         <i class="fas fa-times text-xs"></i> ຍົກເລີກ
       </a>
@@ -220,7 +220,7 @@
   })();
 
   /* Sync TinyMCE to textareas before submit */
-  document.querySelector('form').addEventListener('submit', function () {
+  document.querySelector('main form').addEventListener('submit', function () {
     window.syncTinyMCE();
   });
 </script>

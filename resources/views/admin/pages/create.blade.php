@@ -224,7 +224,7 @@
   })();
 
   /* Sync TinyMCE to textareas before submit */
-  document.querySelector('form').addEventListener('submit', function () {
+  document.querySelector('main form').addEventListener('submit', function () {
     window.syncTinyMCE();
   });
 </script>
